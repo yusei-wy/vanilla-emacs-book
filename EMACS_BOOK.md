@@ -130,7 +130,7 @@ emacs --version  # ターミナルから確認
 
 #### ディレクトリ構造
 ```shell
-mkdir -p ~/.emacs.d/{backups,auto-saves,undo-tree}
+mkdir -p ~/.emacs.d/{backups,auto-saves}
 cd ~/.emacs.d
 touch early-init.el init.el config.org
 ```
