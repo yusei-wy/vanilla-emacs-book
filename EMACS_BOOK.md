@@ -219,6 +219,23 @@ touch early-init.el init.el config.org
 
 * 基盤設定
 
+** macOS固有設定
+#+begin_src emacs-lisp
+  ;; macOSでのMetaキー設定（日本語ユーザー向け）
+  (when (eq system-type 'darwin)
+    ;; EMP版の場合
+    (when (eq window-system 'mac)
+      (setq mac-command-modifier 'meta))     ; Cmd = M-
+    
+    ;; GNU Emacs版の場合
+    (when (eq window-system 'ns)
+      (setq ns-command-modifier 'meta)))     ; Cmd = M-
+
+  ;; NOTE: 特殊文字入力が必要な場合は以下の設定を追加
+  ;; (setq mac-option-modifier 'meta)         ; 左Option = M-
+  ;; (setq mac-right-option-modifier 'none)   ; 右Option = 特殊文字入力用
+#+end_src
+
 ** エンコーディング
 #+begin_src emacs-lisp
   (set-language-environment "UTF-8")
@@ -258,6 +275,51 @@ touch early-init.el init.el config.org
 - ✅ 日本語環境の完全サポート
 - ✅ 安全なバックアップ体制
 
+### 💡 Git管理のヒント
+
+.emacs.dをGitで管理する場合の`.gitignore`設定例：
+
+```gitignore
+# 自動生成ファイル
+config.el
+*.elc
+*~
+
+# バックアップ・自動保存
+backups/
+auto-saves/
+
+# パッケージ管理
+elpaca/
+
+# キャッシュ・履歴
+eln-cache/
+transient/
+.cache/
+recentf
+savehist
+undo-fu-session/
+
+# LSP関連
+.lsp-session-*
+.dap-breakpoints
+
+# プロジェクト関連
+projectile-bookmarks.eld
+projects
+
+# OS固有ファイル
+.DS_Store
+```
+
+**管理すべきファイル**：
+- `init.el`
+- `early-init.el`
+- `config.org`
+- カスタムスニペット（作成した場合）
+
+これにより設定を安全にバージョン管理できます。
+
 ---
 
 ## 第2章：パッケージ管理編 - Elpacaによる拡張性の獲得
@@ -278,40 +340,42 @@ config.orgに追加：
 なぜElpaca？ → 非同期処理で高速、straight.elの後継
 
 #+begin_src emacs-lisp
-  (defvar elpaca-installer-version 0.7)
+  (defvar elpaca-installer-version 0.11)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil
+                                :ref nil :depth 1 :inherit ignore
                                 :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                                 :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-         (build (expand-file-name "elpaca/" elpaca-builds-directory))
-         (order (cdr elpaca-order))
-         (default-directory repo))
+        (build (expand-file-name "elpaca/" elpaca-builds-directory))
+        (order (cdr elpaca-order))
+        (default-directory repo))
     (add-to-list 'load-path (if (file-exists-p build) build repo))
     (unless (file-exists-p repo)
       (make-directory repo t)
-      (when (< emacs-major-version 28) (require 'subr-x))
+      (when (<= emacs-major-version 28) (require 'subr-x))
       (condition-case-unless-debug err
-          (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                   ((zerop (call-process "git" nil buffer t "clone"
-                                         (plist-get order :repo) repo)))
-                   ((zerop (call-process "git" nil buffer t "checkout"
-                                         (or (plist-get order :ref) "--"))))
-                   (emacs (concat invocation-directory invocation-name))
-                   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                   ((require 'elpaca))
-                   ((elpaca-generate-autoloads "elpaca" repo)))
+          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                    ,@(when-let* ((depth (plist-get order :depth)))
+                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                    ,(plist-get order :repo) ,repo))))
+                    ((zerop (call-process "git" nil buffer t "checkout"
+                                          (or (plist-get order :ref) "--"))))
+                    (emacs (concat invocation-directory invocation-name))
+                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                    ((require 'elpaca))
+                    ((elpaca-generate-autoloads "elpaca" repo)))
               (progn (message "%s" (buffer-string)) (kill-buffer buffer))
             (error "%s" (with-current-buffer buffer (buffer-string))))
         ((error) (warn "%s" err) (delete-directory repo 'recursive))))
     (unless (require 'elpaca-autoloads nil t)
       (require 'elpaca)
       (elpaca-generate-autoloads "elpaca" repo)
-      (load "./elpaca-autoloads")))
+      (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
   (add-hook 'after-init-hook #'elpaca-process-queues)
   (elpaca `(,@elpaca-order))
 #+end_src
@@ -353,23 +417,6 @@ config.orgに追加：
 
 ```org
 * 第3章の設定：基本的な使いやすさ
-
-** バックアップ設定（VSCode Timeline風）
-#+begin_src emacs-lisp
-  (use-package emacs
-    :custom
-    (make-backup-files t)
-    (version-control t)
-    (kept-new-versions 20)
-    (kept-old-versions 5)
-    (delete-old-versions t)
-    (backup-directory-alist
-     `((".*" . ,(expand-file-name "backups/" user-emacs-directory))))
-    (auto-save-file-name-transforms
-     `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
-    (backup-by-copying t)
-    (vc-make-backup-files t))
-#+end_src
 
 ** テーマ設定（見た目の改善）
 #+begin_src emacs-lisp
