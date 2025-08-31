@@ -395,3 +395,218 @@ A: Copilot.elを使用:
 - **doom-themes** - テーマ集
 - **doom-modeline** - モードライン
 - **rainbow-delimiters** - 括弧の色分け
+
+---
+
+## 付録G：パッケージ更新ガイド
+
+### Elpacaによるパッケージ管理
+
+#### パッケージの更新方法
+
+##### 個別パッケージの更新
+```elisp
+;; 特定のパッケージを更新
+M-x elpaca-fetch        ; リポジトリから最新版を取得
+M-x elpaca-merge        ; 変更をマージ
+M-x elpaca-rebuild      ; パッケージを再ビルド
+
+;; または一度に実行
+M-x elpaca-update       ; fetch + merge + rebuild
+```
+
+##### 全パッケージの一括更新
+```elisp
+;; すべてのパッケージを更新
+M-x elpaca-update-all   ; 全パッケージの更新
+
+;; インタラクティブに選択して更新
+M-x elpaca-manager      ; パッケージマネージャーUI
+;; U を押してマークしたパッケージを更新
+;; x で実行
+```
+
+##### 更新状況の確認
+```elisp
+;; パッケージの状態確認
+M-x elpaca-status       ; インストール済みパッケージの状態
+M-x elpaca-log          ; Elpacaの操作ログ
+M-x elpaca-info         ; パッケージの詳細情報
+```
+
+#### 更新のベストプラクティス
+
+##### 1. 更新前の準備
+```elisp
+;; 設定ファイルのバックアップ
+(defun my/backup-emacs-config ()
+  "Backup Emacs configuration before update."
+  (interactive)
+  (let ((backup-dir (expand-file-name 
+                     (format "backups/%s" (format-time-string "%Y%m%d-%H%M%S"))
+                     user-emacs-directory)))
+    (make-directory backup-dir t)
+    (copy-directory (expand-file-name "elpaca" user-emacs-directory)
+                    (expand-file-name "elpaca" backup-dir) t t t)
+    (message "Config backed up to %s" backup-dir)))
+```
+
+##### 2. 段階的な更新戦略
+```elisp
+;; 重要度の低いパッケージから更新
+;; 1. UIテーマ、アイコンなど
+;; 2. 補助的なツール（which-key、helpful等）
+;; 3. 言語モード
+;; 4. コア機能（evil、magit、lsp等）
+
+;; パッケージグループごとの更新例
+(defun my/update-ui-packages ()
+  "Update UI-related packages."
+  (interactive)
+  (dolist (pkg '(doom-themes doom-modeline nerd-icons))
+    (elpaca-update pkg)))
+```
+
+##### 3. 安全な更新タイミング
+- **推奨**: 週末や作業の区切りで更新
+- **避ける**: プロジェクトの締切直前
+- **頻度**: 2週間〜1ヶ月に1回程度
+
+#### トラブルシューティング
+
+##### 更新失敗時の対処法
+```elisp
+;; 1. キャッシュのクリア
+M-x elpaca-delete-lockfile
+
+;; 2. パッケージの再インストール
+M-x elpaca-delete          ; パッケージを削除
+M-x elpaca-rebuild         ; 再インストール
+
+;; 3. 完全なリセット（最終手段）
+(defun my/elpaca-reset-package (package)
+  "Completely reset a package."
+  (interactive (list (intern (completing-read "Package: " 
+                                              (elpaca--queued)))))
+  (elpaca-delete package)
+  (delete-directory (elpaca-build-dir package) t)
+  (elpaca-process-queues))
+```
+
+##### ロールバック方法
+```elisp
+;; Git履歴からの復元
+(defun my/elpaca-rollback (package commit)
+  "Rollback package to specific commit."
+  (interactive "sPackage: \nsCommit SHA: ")
+  (let ((default-directory (elpaca-repo-dir (intern package))))
+    (shell-command (format "git checkout %s" commit))
+    (elpaca-rebuild (intern package))))
+
+;; バックアップからの復元
+(defun my/restore-emacs-config (backup-date)
+  "Restore Emacs config from backup."
+  (interactive "sBackup date (YYYYMMDD-HHMMSS): ")
+  (let ((backup-dir (expand-file-name 
+                     (format "backups/%s/elpaca" backup-date)
+                     user-emacs-directory)))
+    (when (file-exists-p backup-dir)
+      (delete-directory (expand-file-name "elpaca" user-emacs-directory) t)
+      (copy-directory backup-dir 
+                      (expand-file-name "elpaca" user-emacs-directory) t t t)
+      (message "Config restored from %s" backup-date))))
+```
+
+##### コンパイルエラーの解決
+```elisp
+;; ネイティブコンパイルのクリア
+(defun my/clear-native-comp-cache ()
+  "Clear native compilation cache."
+  (interactive)
+  (let ((cache-dir (expand-file-name "eln-cache" user-emacs-directory)))
+    (when (file-exists-p cache-dir)
+      (delete-directory cache-dir t)
+      (message "Native compilation cache cleared"))))
+
+;; バイトコンパイルの再実行
+M-x elpaca-rebuild-all
+```
+
+#### 自動更新の設定
+
+##### 定期的な更新チェック
+```elisp
+;; 起動時に更新可能なパッケージをチェック（通知のみ）
+(defun my/check-package-updates ()
+  "Check for package updates on startup."
+  (when (= (random 10) 0)  ; 10%の確率でチェック
+    (elpaca-fetch-all)
+    (message "Package updates available. Run M-x elpaca-update-all when ready.")))
+
+(add-hook 'after-init-hook #'my/check-package-updates)
+```
+
+##### 安全な自動更新
+```elisp
+;; 特定のパッケージのみ自動更新
+(defvar my/auto-update-packages
+  '(doom-themes nerd-icons which-key)
+  "Packages safe to auto-update.")
+
+(defun my/auto-update-safe-packages ()
+  "Auto-update safe packages."
+  (interactive)
+  (dolist (pkg my/auto-update-packages)
+    (condition-case err
+        (elpaca-update pkg)
+      (error (message "Failed to update %s: %s" pkg err)))))
+
+;; 週次で実行（手動確認推奨）
+;; (run-at-time "0 9 * * 0" 604800 #'my/auto-update-safe-packages)
+```
+
+### パッケージ更新チェックリスト
+
+#### ✅ 更新前
+- [ ] 設定ファイルのバックアップ作成
+- [ ] 重要な作業が完了していることを確認
+- [ ] 時間に余裕があることを確認
+
+#### ✅ 更新中
+- [ ] `M-x elpaca-log` でエラーを監視
+- [ ] 重要なパッケージは個別に更新
+- [ ] 更新後は `M-x elpaca-rebuild` で再ビルド
+
+#### ✅ 更新後
+- [ ] Emacsを再起動して動作確認
+- [ ] 主要な機能（Evil、LSP、Magit）の動作確認
+- [ ] 問題があればロールバック
+
+### よくある質問
+
+**Q: 更新後にEmacsが起動しなくなった**
+A: 
+1. `emacs --debug-init` で起動してエラーを確認
+2. `emacs -Q` で最小構成で起動
+3. 問題のパッケージを特定して個別に対処
+
+**Q: パッケージの依存関係エラー**
+A: 
+```elisp
+;; 依存関係の再構築
+M-x elpaca-rebuild-all
+```
+
+**Q: 特定のバージョンに固定したい**
+A: 
+```elisp
+(use-package some-package
+  :ensure (:repo "user/repo" :ref "v1.2.3"))  ; タグやコミットSHAを指定
+```
+
+**Q: オフラインでパッケージ管理したい**
+A: Elpacaのローカルミラーを作成:
+```bash
+# elpacaディレクトリをバックアップ
+cp -r ~/.emacs.d/elpaca ~/.emacs.d/elpaca-mirror
+```
