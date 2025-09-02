@@ -440,17 +440,15 @@ config.orgに追加：
 
 ** Editor補助機能
 
-*** puni（構造的編集）
+*** 括弧の自動補完
 #+begin_src emacs-lisp
-  (use-package puni
+  (use-package smartparens
     :ensure t
-    :hook (prog-mode . puni-mode)
-    :bind
-    (:map puni-mode-map
-          ("C-)" . puni-slurp-forward)
-          ("C-(" . puni-slurp-backward)
-          ("C-}" . puni-barf-forward)
-          ("C-{" . puni-barf-backward)))
+    :hook (prog-mode . smartparens-mode)
+    :init
+    (require 'smartparens-config)  ; デフォルト設定を読み込み
+    :config
+    (smartparens-global-mode t))  ; グローバルに有効化
 #+end_src
 
 *** ace-window（ウィンドウ移動）
@@ -494,7 +492,6 @@ config.orgに追加：
 ### ✨ この章で得られたもの
 - ✅ 美しいテーマとフォント設定
 - ✅ 安全な自動バックアップ機能
-- ✅ 構造的な括弧編集（puni）
 - ✅ ウィンドウ間の高速移動（ace-window）
 - ✅ 詳細なヘルプシステム（helpful）
 - ✅ プロジェクト設定の自動適用（editorconfig）
@@ -2429,7 +2426,7 @@ M-x profiler-report
 | モジュール | 含まれる機能 | 対応する章 |
 |-----------|-------------|-----------|
 | **emacs.org** | 文字コード、バックアップ、基本設定 | 第1-3章の基礎部分 |
-| **editor.org** | Evil、which-key、puni、ace-window等 | 第3-4章 |
+| **editor.org** | Evil、which-key、ace-window等 | 第3-4章 |
 | **completion.org** | Corfu、Cape、Consult、Orderless等 | 第5章 |
 | **tools.org** | LSP、Git、Projectile、Treemacs、Vterm | 第6-7章 |
 | **lang.org** | Go、Haskell、TypeScript、Web開発等 | 第9章 |
