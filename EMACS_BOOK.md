@@ -496,6 +496,20 @@ config.orgに追加：
 - ✅ 詳細なヘルプシステム（helpful）
 - ✅ プロジェクト設定の自動適用（editorconfig）
 
+### 💡 トラブルシューティング
+
+#### org-modeのコードブロック内インデント問題
+**症状**: org-modeのemacs-lispコードブロック内で改行すると、意図せず行がインデントされる
+
+**解決方法**: config.orgの先頭付近に以下を追加
+```elisp
+(setq org-src-preserve-indentation t)
+```
+
+**回避策**: C-jで改行、またはC-c 'で専用バッファで編集
+
+*org-mode 9.4.3以降の既知のバグによる問題です*
+
 ---
 
 ## 第4章：Evil編 - Vimの力を手に入れる
