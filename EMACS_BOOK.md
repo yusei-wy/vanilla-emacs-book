@@ -510,6 +510,16 @@ config.orgに追加：
 
 *org-mode 9.4.3以降の既知のバグによる問題です*
 
+#### シンボリックリンクファイルの確認を無効化
+**症状**: Git管理下のファイルへのシンボリックリンクを開くたびに確認ダイアログが表示される
+
+**解決方法**: 設定ファイルに以下を追加
+```elisp
+(setq vc-follow-symlinks t)
+```
+
+*必要に応じて個人の設定に追加してください*
+
 ---
 
 ## 第4章：Evil編 - Vimの力を手に入れる
@@ -653,11 +663,17 @@ Vimの便利機能をEmacsでも使えるようにします。
 #+begin_src emacs-lisp
   (use-package general
     :ensure t
+    :after evil
     :config
+    ;; SPCキーの既存バインドを解除
+    (general-def
+      :states '(normal visual motion)
+      "SPC" nil)
+    
+    ;; リーダーキーの定義
     (general-create-definer leader-def
-      :states '(normal visual insert emacs)
-      :prefix "SPC"
-      :non-normal-prefix "M-SPC")
+      :states '(normal visual)
+      :prefix "SPC")
 
     ;; 基本的なキーバインド
     (leader-def
@@ -666,7 +682,9 @@ Vimの便利機能をEmacsでも使えるようにします。
       "f s" '(save-buffer :which-key "save file")
       "b" '(:ignore t :which-key "buffer")
       "b b" '(switch-to-buffer :which-key "switch buffer")
-      "b k" '(kill-this-buffer :which-key "kill buffer")))
+      "b k" '(kill-this-buffer :which-key "kill buffer")
+      ;; vundoのキーバインドもここに追加
+      "u" '(vundo :which-key "undo tree visualizer")))
 #+end_src
 
 ** Undo/Redo機能（より安定的な実装）
@@ -697,12 +715,6 @@ Vimの便利機能をEmacsでも使えるようにします。
     :custom
     ;; Gitコミットメッセージなどは永続化しない
     (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))
-#+end_src
-
-キーバインド設定：
-#+begin_src emacs-lisp
-  (leader-def
-    "u" '(vundo :which-key "undo tree visualizer"))
 #+end_src
 ```
 
