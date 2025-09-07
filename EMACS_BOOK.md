@@ -657,6 +657,16 @@ Vimの便利機能をEmacsでも使えるようにします。
     (evil-goggles-mode)
     :custom
     (evil-goggles-duration 0.100))
+
+  ;; evil-escape: jkでNormalモードへ
+  (use-package evil-escape
+    :ensure t
+    :after evil
+    :config
+    (evil-escape-mode 1)
+    :custom
+    (evil-escape-key-sequence "jk")
+    (evil-escape-delay 0.2))
 #+end_src
 
 ** リーダーキー（SPCキー）の設定
