@@ -595,6 +595,7 @@ config.orgに追加：
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
     (setq evil-want-C-i-jump nil)  ; TABキーの競合回避
+    (setq evil-want-C-u-scroll t)  ; C-uでスクロールアップを有効化
     :config
     (evil-mode 1))
 #+end_src
