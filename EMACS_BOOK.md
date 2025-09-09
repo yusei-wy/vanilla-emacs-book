@@ -714,6 +714,9 @@ Vimの便利機能をEmacsでも使えるようにします。
   (use-package vundo
     :ensure t
     :defer t
+    :custom
+    ;; デフォルトの3では履歴ツリーが見切れるため増やす
+    (vundo-window-max-height 10)
     :config
     ;; Unicodeシンボルで美しく表示
     (setq vundo-glyph-alist vundo-unicode-symbols))
