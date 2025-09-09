@@ -695,7 +695,10 @@ Vimの便利機能をEmacsでも使えるようにします。
       "b b" '(switch-to-buffer :which-key "switch buffer")
       "b k" '(kill-this-buffer :which-key "kill buffer")
       ;; vundoのキーバインドもここに追加
-      "u" '(vundo :which-key "undo tree visualizer")))
+      "u" '(vundo :which-key "undo tree visualizer")
+      ;; コマンドパレット（M-x強化）
+      "SPC" '(execute-extended-command :which-key "M-x")
+      ":" '(eval-expression :which-key "eval")))
 #+end_src
 
 ** Undo/Redo機能（より安定的な実装）
@@ -795,18 +798,6 @@ Vimの便利機能をEmacsでも使えるようにします。
 #+end_src
 
 ** VSCode風操作の実現
-
-*** コマンドパレット（M-x強化）
-#+begin_src emacs-lisp
-  ;; M-xをVSCodeのコマンドパレット風に
-  (global-set-key (kbd "M-x") 'execute-extended-command)
-
-  ;; リーダーキーでもアクセス可能に
-  (with-eval-after-load 'general
-    (leader-def
-      "SPC" '(execute-extended-command :which-key "M-x")
-      ":" '(eval-expression :which-key "eval")))
-#+end_src
 
 *** プロジェクトファイル検索（Cmd+P相当）
 #+begin_src emacs-lisp
