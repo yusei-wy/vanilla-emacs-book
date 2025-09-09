@@ -266,6 +266,19 @@ touch early-init.el init.el config.org
   ;; 読み込みプロセスの最適化
   (setq read-process-output-max (* 1024 1024))  ; 1MB
 #+end_src
+
+** 汎用マクロ定義
+#+begin_src emacs-lisp
+  ;; 複数パッケージの読み込み待機マクロ
+  (defmacro with-eval-after-features (features &rest body)
+    "Evaluate BODY after all FEATURES have been loaded.
+    FEATURES is a list of feature symbols."
+    (declare (indent 1))
+    (if (null features)
+        `(progn ,@body)
+      `(with-eval-after-load ',(car features)
+         (with-eval-after-features ,(cdr features) ,@body))))
+#+end_src
 ```
 
 ### ✨ この章で得られたもの
@@ -695,10 +708,7 @@ Vimの便利機能をEmacsでも使えるようにします。
       "b b" '(switch-to-buffer :which-key "switch buffer")
       "b k" '(kill-this-buffer :which-key "kill buffer")
       ;; vundoのキーバインドもここに追加
-      "u" '(vundo :which-key "undo tree visualizer")
-      ;; コマンドパレット（M-x強化）
-      "SPC" '(execute-extended-command :which-key "M-x")
-      ":" '(eval-expression :which-key "eval")))
+      "u" '(vundo :which-key "undo tree visualizer")))
 #+end_src
 
 ** Undo/Redo機能（より安定的な実装）
@@ -799,6 +809,15 @@ Vimの便利機能をEmacsでも使えるようにします。
 
 ** VSCode風操作の実現
 
+*** コマンドパレット（M-x強化）
+#+begin_src emacs-lisp
+  ;; リーダーキーでコマンドパレットアクセス
+  (with-eval-after-features (evil general)
+    (leader-def
+      "SPC" '(execute-extended-command :which-key "M-x")
+      ":" '(eval-expression :which-key "eval")))
+#+end_src
+
 *** プロジェクトファイル検索（Cmd+P相当）
 #+begin_src emacs-lisp
   ;; projectile: プロジェクト管理
@@ -816,7 +835,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     :after (consult projectile))
 
   ;; キーバインド（VSCode風）
-  (with-eval-after-load 'general
+  (with-eval-after-features (evil general)
     (leader-def
       "p" '(:ignore t :which-key "project")
       "p f" '(consult-projectile-find-file :which-key "find file")
@@ -860,7 +879,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     (embark-collect-mode . consult-preview-at-point-mode))
 
   ;; キーバインド
-  (with-eval-after-load 'general
+  (with-eval-after-features (evil general)
     (leader-def
       "/" '(consult-ripgrep :which-key "search project")
       "s" '(:ignore t :which-key "search")
@@ -895,7 +914,7 @@ Vimの便利機能をEmacsでも使えるようにします。
      "C-M-d" 'evil-mc-make-all-cursors))      ; Ctrl+Alt+D: すべて選択
 
   ;; リーダーキーでも操作可能
-  (with-eval-after-load 'general
+  (with-eval-after-features (evil general)
     (leader-def
       "m" '(:ignore t :which-key "multiple-cursors")
       "m a" '(evil-mc-make-all-cursors :which-key "select all")
@@ -970,7 +989,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     ;;               (eglot-format-buffer))))
     
     ;; キーバインド
-    (with-eval-after-load 'general
+    (with-eval-after-features (evil general)
       (leader-def
         :keymaps 'eglot-mode-map
         "l" '(:ignore t :which-key "lsp")
@@ -1004,7 +1023,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     (setq flymake-fringe-indicator-position 'left-fringe)
     
     ;; キーバインド
-    (with-eval-after-load 'general
+    (with-eval-after-features (evil general)
       (leader-def
         "e" '(:ignore t :which-key "errors")
         "e n" '(flymake-goto-next-error :which-key "next error")
@@ -1039,11 +1058,12 @@ Vimの便利機能をEmacsでも使えるようにします。
     :ensure t
     :bind (("C-x g" . magit-status)))
 
-  (leader-def
-    "g" '(:ignore t :which-key "git")
-    "g g" '(magit-status :which-key "status")
-    "g b" '(magit-blame :which-key "blame")
-    "g l" '(magit-log :which-key "log"))
+  (with-eval-after-features (evil general)
+    (leader-def
+      "g" '(:ignore t :which-key "git")
+      "g g" '(magit-status :which-key "status")
+      "g b" '(magit-blame :which-key "blame")
+      "g l" '(magit-log :which-key "log")))
 #+end_src
 
 ** Treemacs（ファイルツリー）
@@ -1060,8 +1080,9 @@ Vimの便利機能をEmacsでも使えるようにします。
     :after (treemacs evil)
     :ensure t)
 
-  (leader-def
-    "o p" '(treemacs :which-key "project tree"))
+  (with-eval-after-features (evil general)
+    (leader-def
+      "o p" '(treemacs :which-key "project tree")))
 #+end_src
 
 ** diff-hl（変更箇所の可視化）
@@ -1121,12 +1142,13 @@ Vimの便利機能をEmacsでも使えるようにします。
     (setq multi-vterm-dedicated-window-height 30))
 
   ;; キーバインド
-  (leader-def
-    "o" '(:ignore t :which-key "open")
-    "o t" '(multi-vterm :which-key "terminal")
-    "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
-    "o n" '(multi-vterm-next :which-key "next terminal")
-    "o p" '(multi-vterm-prev :which-key "prev terminal"))
+  (with-eval-after-features (evil general)
+    (leader-def
+      "o" '(:ignore t :which-key "open")
+      "o t" '(multi-vterm :which-key "terminal")
+      "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
+      "o n" '(multi-vterm-next :which-key "next terminal")
+      "o p" '(multi-vterm-prev :which-key "prev terminal")))
 #+end_src
 
 ** ターミナルとの連携強化
@@ -1180,9 +1202,10 @@ Vimの便利機能をEmacsでも使えるようにします。
     (define-key vterm-mode-map (kbd "C-y") 'my/vterm-yank))
 
   ;; リーダーキー追加
-  (leader-def
-    "o h" '(my/vterm-here :which-key "terminal here")
-    "o r" '(my/run-in-vterm :which-key "run command"))
+  (with-eval-after-features (evil general)
+    (leader-def
+      "o h" '(my/vterm-here :which-key "terminal here")
+      "o r" '(my/run-in-vterm :which-key "run command")))
 #+end_src
 ```
 
