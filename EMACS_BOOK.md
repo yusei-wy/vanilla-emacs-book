@@ -657,7 +657,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     :config
     (evil-goggles-mode)
     :custom
-    (evil-goggles-duration 0.100))
+    (evil-goggles-duration 0.1))
 
   ;; evil-escape: jkでNormalモードへ
   (use-package evil-escape
@@ -813,7 +813,7 @@ Vimの便利機能をEmacsでも使えるようにします。
   (use-package projectile
     :ensure t
     :init
-    (projectile-mode +1)
+    (projectile-mode 1)
     :custom
     (projectile-completion-system 'default)
     (projectile-enable-caching t))
@@ -1295,7 +1295,7 @@ Vimの便利機能をEmacsでも使えるようにします。
   (use-package solaire-mode
     :ensure t
     :config
-    (solaire-global-mode +1))
+    (solaire-global-mode 1))
 #+end_src
 
 ** hl-todo（キーワードハイライト）
