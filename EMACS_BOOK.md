@@ -829,7 +829,6 @@ Vimの便利機能をEmacsでも使えるようにします。
       :states '(normal visual)
       :prefix "SPC"
       "p" '(:ignore t :which-key "project")
-      "p f" '(consult-projectile-find-file :which-key "find file")
       "p p" '(consult-projectile-switch-project :which-key "switch project")
       ;; Ctrl+P風のファイル検索
       "f p" '(consult-projectile-find-file :which-key "quick open")))
