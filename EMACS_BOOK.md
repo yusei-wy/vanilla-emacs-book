@@ -686,16 +686,30 @@ Vimの便利機能をEmacsでも使えるようにします。
       :states '(normal visual)
       :prefix "SPC")
 
-    ;; 基本的なキーバインド
+    ;; 基本的なキーバインド構造とコア機能
     (leader-def
+      ;; グループ定義
       "f" '(:ignore t :which-key "file")
+      "b" '(:ignore t :which-key "buffer")
+      "p" '(:ignore t :which-key "project")
+      "g" '(:ignore t :which-key "git")
+      "l" '(:ignore t :which-key "lsp")
+      "e" '(:ignore t :which-key "errors")
+      "s" '(:ignore t :which-key "search")
+      "m" '(:ignore t :which-key "multiple-cursors")
+      "n" '(:ignore t :which-key "notes")
+      "o" '(:ignore t :which-key "open")
+      "h" '(:ignore t :which-key "help/benchmark")
+      "d" '(:ignore t :which-key "debug")
+      ;; コア機能（常に必要）
+      "SPC" '(execute-extended-command :which-key "M-x")
+      ":" '(eval-expression :which-key "eval")
+      ;; 基本ファイル操作
       "f f" '(find-file :which-key "find file")
       "f s" '(save-buffer :which-key "save file")
-      "b" '(:ignore t :which-key "buffer")
+      ;; 基本バッファ操作
       "b b" '(switch-to-buffer :which-key "switch buffer")
-      "b k" '(kill-this-buffer :which-key "kill buffer")
-      ;; vundoのキーバインドもここに追加
-      "u" '(vundo :which-key "undo tree visualizer")))
+      "b k" '(kill-this-buffer :which-key "kill buffer")))
 #+end_src
 
 ** Undo/Redo機能（より安定的な実装）
@@ -719,7 +733,13 @@ Vimの便利機能をEmacsでも使えるようにします。
     (vundo-window-max-height 10)
     :config
     ;; Unicodeシンボルで美しく表示
-    (setq vundo-glyph-alist vundo-unicode-symbols))
+    (setq vundo-glyph-alist vundo-unicode-symbols)
+    ;; vundo関連キーバインド
+    (with-eval-after-load 'general
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC"
+        "u" '(vundo :which-key "undo tree visualizer"))))
 
   ;; undo-fu-session: 履歴の永続化（オプション）
   (use-package undo-fu-session
@@ -797,15 +817,7 @@ Vimの便利機能をEmacsでも使えるようにします。
 ** VSCode風操作の実現
 
 *** コマンドパレット（M-x強化）
-#+begin_src emacs-lisp
-  ;; リーダーキーでコマンドパレットアクセス
-  (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC"
-      "SPC" '(execute-extended-command :which-key "M-x")
-      ":" '(eval-expression :which-key "eval")))
-#+end_src
+コマンドパレット機能は基本キーバインド（第4章）で設定済み
 
 *** プロジェクトファイル検索（Cmd+P相当）
 #+begin_src emacs-lisp
@@ -816,22 +828,33 @@ Vimの便利機能をEmacsでも使えるようにします。
     (projectile-mode 1)
     :custom
     (projectile-completion-system 'default)
-    (projectile-enable-caching t))
+    (projectile-enable-caching t)
+    :config
+    ;; プロジェクト関連キーバインド
+    (with-eval-after-load 'general
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC p"
+        "p" '(consult-projectile-switch-project :which-key "switch project")
+        "r" '(projectile-replace :which-key "replace in project")
+        "R" '(projectile-replace-regexp :which-key "replace regexp"))))
 
   ;; consult-projectile: consultとの統合
   (use-package consult-projectile
     :ensure t
-    :after (consult projectile))
-
-  ;; キーバインド（VSCode風）
-  (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC"
-      "p" '(:ignore t :which-key "project")
-      "p p" '(consult-projectile-switch-project :which-key "switch project")
-      ;; Ctrl+P風のファイル検索
-      "f p" '(consult-projectile-find-file :which-key "quick open")))
+    :after (consult projectile)
+    :config
+    ;; consult-projectile固有のキーバインド
+    (with-eval-after-load 'general
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC"
+        ;; ファイル検索（Ctrl+P風）
+        "f p" '(consult-projectile-find-file :which-key "quick open"))
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC p"
+        "f" '(consult-projectile-find-file :which-key "find file"))))
 #+end_src
 
 *** プロジェクト内テキスト検索・置換（Cmd+Shift+F相当）
@@ -868,17 +891,17 @@ Vimの便利機能をEmacsでも使えるようにします。
     :hook
     (embark-collect-mode . consult-preview-at-point-mode))
 
-  ;; キーバインド
+  ;; 検索関連キーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
       :prefix "SPC"
-      "/" '(consult-ripgrep :which-key "search project")
-      "s" '(:ignore t :which-key "search")
-      "s p" '(consult-ripgrep :which-key "search project")
-      "s l" '(consult-line :which-key "search lines")
-      "s r" '(projectile-replace :which-key "replace in project")
-      "s R" '(projectile-replace-regexp :which-key "replace regexp")))
+      "/" '(consult-ripgrep :which-key "search project"))
+    (general-def
+      :states '(normal visual)
+      :prefix "SPC s"
+      "p" '(consult-ripgrep :which-key "search project")
+      "l" '(consult-line :which-key "search lines")))
 
   ;; 使い方：
   ;; 1. SPC / または SPC s p でプロジェクト内検索
@@ -905,16 +928,15 @@ Vimの便利機能をEmacsでも使えるようにします。
      "C-S-d" 'evil-mc-skip-and-goto-next-match ; Ctrl+Shift+D: スキップして次へ
      "C-M-d" 'evil-mc-make-all-cursors))      ; Ctrl+Alt+D: すべて選択
 
-  ;; リーダーキーでも操作可能
+  ;; マルチカーソル関連キーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "m" '(:ignore t :which-key "multiple-cursors")
-      "m a" '(evil-mc-make-all-cursors :which-key "select all")
-      "m n" '(evil-mc-make-and-goto-next-match :which-key "next match")
-      "m p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
-      "m q" '(evil-mc-undo-all-cursors :which-key "quit")))
+      :prefix "SPC m"
+      "a" '(evil-mc-make-all-cursors :which-key "select all")
+      "n" '(evil-mc-make-and-goto-next-match :which-key "next match")
+      "p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
+      "q" '(evil-mc-undo-all-cursors :which-key "quit")))
 #+end_src
 
 ** Corfu（コード補完）
@@ -982,18 +1004,17 @@ Vimの便利機能をEmacsでも使えるようにします。
     ;;             (when (eglot-managed-p)
     ;;               (eglot-format-buffer))))
     
-    ;; キーバインド
+    ;; LSP関連キーバインド
     (with-eval-after-load 'general
       (general-def
         :states '(normal visual)
-        :prefix "SPC"
+        :prefix "SPC l"
         :keymaps 'eglot-mode-map
-        "l" '(:ignore t :which-key "lsp")
-        "l a" '(eglot-code-actions :which-key "code actions")
-        "l r" '(eglot-rename :which-key "rename")
-        "l f" '(eglot-format :which-key "format")
-        "l d" '(xref-find-definitions :which-key "find definitions")
-        "l R" '(xref-find-references :which-key "find references"))))
+        "a" '(eglot-code-actions :which-key "code actions")
+        "r" '(eglot-rename :which-key "rename")
+        "f" '(eglot-format :which-key "format")
+        "d" '(xref-find-definitions :which-key "find definitions")
+        "R" '(xref-find-references :which-key "find references"))))
   
   ;; 必要なLSPサーバーのインストール手順:
   ;; Go: go install golang.org/x/tools/gopls@latest
@@ -1018,16 +1039,15 @@ Vimの便利機能をEmacsでも使えるようにします。
     ;; エラー表示の改善
     (setq flymake-fringe-indicator-position 'left-fringe)
     
-    ;; キーバインド
+    ;; エラーチェック関連キーバインド
     (with-eval-after-load 'general
       (general-def
         :states '(normal visual)
-        :prefix "SPC"
-        "e" '(:ignore t :which-key "errors")
-        "e n" '(flymake-goto-next-error :which-key "next error")
-        "e p" '(flymake-goto-prev-error :which-key "prev error")
-        "e l" '(flymake-show-buffer-diagnostics :which-key "list errors")
-        "e L" '(flymake-show-project-diagnostics :which-key "project errors"))))
+        :prefix "SPC e"
+        "n" '(flymake-goto-next-error :which-key "next error")
+        "p" '(flymake-goto-prev-error :which-key "prev error")
+        "l" '(flymake-show-buffer-diagnostics :which-key "list errors")
+        "L" '(flymake-show-project-diagnostics :which-key "project errors"))))
 #+end_src
 
 *** オプション：Flycheck（より多くの言語サポートが必要な場合）
@@ -1054,16 +1074,16 @@ Vimの便利機能をEmacsでも使えるようにします。
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
-    :bind (("C-x g" . magit-status)))
-
-  (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC"
-      "g" '(:ignore t :which-key "git")
-      "g g" '(magit-status :which-key "status")
-      "g b" '(magit-blame :which-key "blame")
-      "g l" '(magit-log :which-key "log")))
+    :bind (("C-x g" . magit-status))
+    :config
+    ;; Git関連キーバインド
+    (with-eval-after-load 'general
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC g"
+        "g" '(magit-status :which-key "status")
+        "b" '(magit-blame :which-key "blame")
+        "l" '(magit-log :which-key "log"))))
 #+end_src
 
 ** Treemacs（ファイルツリー）
@@ -1074,17 +1094,17 @@ Vimの便利機能をEmacsでも使えるようにします。
     :config
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
-    (treemacs-git-mode 'deferred))
+    (treemacs-git-mode 'deferred)
+    ;; Treemacs関連キーバインド
+    (with-eval-after-load 'general
+      (general-def
+        :states '(normal visual)
+        :prefix "SPC o"
+        "p" '(treemacs :which-key "project tree"))))
 
   (use-package treemacs-evil
     :after (treemacs evil)
     :ensure t)
-
-  (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC"
-      "o p" '(treemacs :which-key "project tree")))
 #+end_src
 
 ** diff-hl（変更箇所の可視化）
@@ -1143,16 +1163,15 @@ Vimの便利機能をEmacsでも使えるようにします。
     :config
     (setq multi-vterm-dedicated-window-height 30))
 
-  ;; キーバインド
+  ;; ターミナル関連キーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "o" '(:ignore t :which-key "open")
-      "o t" '(multi-vterm :which-key "terminal")
-      "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
-      "o n" '(multi-vterm-next :which-key "next terminal")
-      "o p" '(multi-vterm-prev :which-key "prev terminal")))
+      :prefix "SPC o"
+      "t" '(multi-vterm :which-key "terminal")
+      "T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
+      "n" '(multi-vterm-next :which-key "next terminal")
+      "p" '(multi-vterm-prev :which-key "prev terminal")))
 #+end_src
 
 ** ターミナルとの連携強化
@@ -1205,13 +1224,13 @@ Vimの便利機能をEmacsでも使えるようにします。
   (with-eval-after-load 'vterm
     (define-key vterm-mode-map (kbd "C-y") 'my/vterm-yank))
 
-  ;; リーダーキー追加
+  ;; ターミナル便利機能のキーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "o h" '(my/vterm-here :which-key "terminal here")
-      "o r" '(my/run-in-vterm :which-key "run command")))
+      :prefix "SPC o"
+      "h" '(my/vterm-here :which-key "terminal here")
+      "r" '(my/run-in-vterm :which-key "run command")))
 #+end_src
 ```
 
@@ -1684,12 +1703,11 @@ GCMH使用時: アイドル時に自動的にGC実行
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "h" '(:ignore t :which-key "help/benchmark")
-      "h b" '(my/benchmark-init :which-key "benchmark startup")
-      "h p" '(my/show-package-stats :which-key "package stats")
-      "h m" '(my/memory-usage :which-key "memory usage")
-      "h t" '(my/time-package-loads :which-key "time packages")))
+      :prefix "SPC h"
+      "b" '(my/benchmark-init :which-key "benchmark startup")
+      "p" '(my/show-package-stats :which-key "package stats")
+      "m" '(my/memory-usage :which-key "memory usage")
+      "t" '(my/time-package-loads :which-key "time packages")))
 #+end_src
 ```
 
@@ -1816,15 +1834,14 @@ WAIT  CANCELED  Archive
        (python . t)
        (shell . t))))
 
-  ;; キーバインド
+  ;; Org-mode関連キーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "n" '(:ignore t :which-key "notes")
-      "n n" '(org-capture :which-key "capture")
-      "n a" '(org-agenda :which-key "agenda")
-      "n l" '(org-store-link :which-key "store link")))
+      :prefix "SPC n"
+      "n" '(org-capture :which-key "capture")
+      "a" '(org-agenda :which-key "agenda")
+      "l" '(org-store-link :which-key "store link")))
 #+end_src
 
 ** Org-agenda（GTDタスク管理）
@@ -2126,25 +2143,24 @@ WAIT  CANCELED  Archive
     ;; Go
     (require 'dap-dlv-go))
 
-  ;; キーバインド
+  ;; デバッグ関連キーバインド
   (with-eval-after-load 'general
     (general-def
       :states '(normal visual)
-      :prefix "SPC"
-      "d" '(:ignore t :which-key "debug")
-      "d d" '(dap-debug :which-key "start debug")
-      "d n" '(dap-next :which-key "next")
-      "d i" '(dap-step-in :which-key "step in")
-      "d o" '(dap-step-out :which-key "step out")
-      "d c" '(dap-continue :which-key "continue")
-      "d r" '(dap-restart-frame :which-key "restart")
-      "d q" '(dap-quit :which-key "quit")
-      "d b" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
-      "d B" '(dap-ui-breakpoints :which-key "list breakpoints")
-      "d e" '(dap-eval :which-key "eval")
-      "d E" '(dap-eval-thing-at-point :which-key "eval at point")
-      "d l" '(dap-ui-locals :which-key "locals")
-      "d s" '(dap-ui-sessions :which-key "sessions")))
+      :prefix "SPC d"
+      "d" '(dap-debug :which-key "start debug")
+      "n" '(dap-next :which-key "next")
+      "i" '(dap-step-in :which-key "step in")
+      "o" '(dap-step-out :which-key "step out")
+      "c" '(dap-continue :which-key "continue")
+      "r" '(dap-restart-frame :which-key "restart")
+      "q" '(dap-quit :which-key "quit")
+      "b" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
+      "B" '(dap-ui-breakpoints :which-key "list breakpoints")
+      "e" '(dap-eval :which-key "eval")
+      "E" '(dap-eval-thing-at-point :which-key "eval at point")
+      "l" '(dap-ui-locals :which-key "locals")
+      "s" '(dap-ui-sessions :which-key "sessions")))
 #+end_src
 
 ** テストフレームワーク統合
