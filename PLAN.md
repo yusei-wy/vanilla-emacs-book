@@ -457,4 +457,162 @@ UI/テーマ:        0.10秒（最終段階）
 
 ---
 
+## 14. EMACS_BOOK.md 重複パッケージ問題と章整理計画
+
+### 📊 現状分析
+
+#### 🔥 発見された重複パッケージ
+1. **`consult`**: Line 806（基本設定）+ Line 863（ripgrep設定）
+2. **`magit`**: Line 1075（第6章実装）+ Line 1582（第10章遅延読み込み例）  
+3. **`treemacs`**: Line 1091（第6章実装）+ Line 1587（第10章遅延読み込み例）
+4. **`doom-themes`**: Line 423（第3章基本）+ Line 1299（第8章詳細）
+
+#### 📋 ハイブリッド方式キーバインドの問題
+- 基本グループ構造は第4章で一元定義済み
+- 各機能の詳細は各パッケージで分散定義済み
+- しかし重複パッケージにより設定が競合している
+
+### 🎯 修正計画
+
+#### **Phase 1: 重複パッケージの統合**
+
+##### 1.1 Consultの統合（第5章）
+```elisp
+# 修正前: 2箇所に分散
+(use-package consult :bind (...))  # Line 806
+(use-package consult :config (...)) # Line 863
+
+# 修正後: 1箇所に統合
+(use-package consult
+  :ensure t
+  :bind (("C-x b" . consult-buffer)
+         ("C-x 4 b" . consult-buffer-other-window)
+         ("M-y" . consult-yank-pop)
+         ("M-g g" . consult-goto-line)
+         ("M-g M-g" . consult-goto-line)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line))
+  :config
+  ;; ripgrep設定も統合
+  (setopt consult-ripgrep-args
+          "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --search-zip")
+  ;; 検索関連キーバインド
+  (with-eval-after-load 'general
+    (general-def
+      :states '(normal visual)
+      :prefix "SPC"
+      "/" '(consult-ripgrep :which-key "search project"))
+    (general-def
+      :states '(normal visual)
+      :prefix "SPC s"
+      "p" '(consult-ripgrep :which-key "search project")
+      "l" '(consult-line :which-key "search lines"))))
+```
+
+##### 1.2 Doom-themesの統合（第8章に移動）
+```elisp
+# 第3章から削除: Line 423-426
+# 第8章に統合: より詳細な設定として
+
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; グローバル設定
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  ;; テーマをロード（doom-oneがおすすめ）
+  (load-theme 'doom-one t)
+  ;; org-modeの見た目を改善
+  (doom-themes-org-config))
+```
+
+##### 1.3 第10章の遅延読み込み例を明確化
+```elisp
+# 修正前: 実装と例が混在
+(use-package magit :ensure t :bind (...)) # Line 1075 実装
+(use-package magit :defer t :commands (...)) # Line 1582 例
+
+# 修正後: 例であることを明記
+** 遅延読み込み戦略（設定例）
+以下は遅延読み込みの設定例です。実際の設定は各章で行われています。
+
+#+begin_src emacs-lisp :tangle no
+  ;; 重いパッケージの遅延読み込み例（実装は各章参照）
+  (use-package magit
+    :defer t
+    :commands (magit-status magit-clone))
+#+end_src
+```
+
+#### **Phase 2: 章構成の最適化**
+
+##### 2.1 第3章: エディタ基礎編
+- 基本的な編集機能のみに集中
+- doom-themes設定を第8章に移動
+- smartparens、ace-window、helpful等は維持
+
+##### 2.2 第5章: 補完システム編
+- consult設定を完全統合
+- vertico、orderless、marginalia、corfu設定は維持
+- 検索・置換機能をここに集約
+
+##### 2.3 第8章: UI/UX改善編
+- doom-themes設定をここに移動・拡張
+- doom-modeline、nerd-icons等と合わせて統合
+- テーマ関連の全設定を一元化
+
+##### 2.4 第10章: パフォーマンス最適化編
+- 重複パッケージ設定を削除
+- 遅延読み込み例であることを明記（:tangle no使用）
+- ベンチマークとプロファイリングツールに集中
+
+#### **Phase 3: ファイル構造の改善**
+
+##### 3.1 設定の論理的グループ化
+```
+第1章: 基盤（early-init, init, 基本設定）
+第2章: パッケージ管理（Elpaca, use-package）
+第3章: エディタ基礎（編集支援機能のみ）
+第4章: Evil（Vimキーバインド + 基本キー構造）
+第5章: 補完システム（検索・補完の完全統合）
+第6章: 開発環境（LSP, Git, プロジェクト管理）
+第7章: ターミナル統合（Vterm関連）
+第8章: UI/UX（テーマ・見た目の完全統合）
+第9章: 言語別設定（プログラミング言語）
+第10章: パフォーマンス最適化（ベンチマーク重視）
+第11章: Org-mode活用（ドキュメント・タスク管理）
+```
+
+##### 3.2 設定原則の確立
+1. **1パッケージ1箇所**: 同一パッケージの設定は1箇所にまとめる
+2. **機能別グループ化**: 関連機能は同じ章にまとめる
+3. **例と実装の分離**: 例は`:tangle no`で明確に区別
+4. **キーバインドの統一**: ハイブリッド方式を維持
+
+### 📅 実装タイムライン
+
+#### Week 1: 重複解消
+- Day 1: consult統合
+- Day 2: doom-themes移動
+- Day 3: 第10章例の明確化
+
+#### Week 2: 章最適化
+- Day 1-2: 第3章・第8章の再構成
+- Day 3-4: 第5章の完全統合
+- Day 5: 第10章の純化
+
+#### Week 3: 品質保証
+- Day 1-2: 全章の整合性チェック
+- Day 3-4: 実際の設定での動作確認
+- Day 5: ドキュメント最終調整
+
+### 🎯 期待される効果
+
+1. **設定の一意性**: 各パッケージが1箇所でのみ定義される
+2. **保守性向上**: 重複による混乱が解消される
+3. **学習効率**: 論理的な章構成により理解しやすくなる
+4. **実用性**: 実装と例が明確に分離される
+
+---
+
 根拠：この計画は、あなたの要望（起動速度重視、VSCodeライク、段階的移行、Format on Save、VSCode Timeline相当のバックアップ）をすべて満たし、Doom Emacsの良い部分を維持しつつ、完全に制御可能な環境を実現します。

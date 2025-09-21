@@ -1,0 +1,159 @@
+# 第9章：言語別設定編 - 各言語への最適化
+
+[← 前の章](09_ui.md) | [目次](../README.md) | [次の章 →](11_performance.md)
+
+---
+
+## この章の目標
+- 各プログラミング言語の専用モード設定
+- 言語固有の便利機能とインデント設定
+- 構造化された設定で将来の拡張に対応
+
+## 第9章の設定：言語別カスタマイズ
+
+### プログラミング言語
+
+#### Go言語
+```emacs-lisp
+(use-package go-mode
+  :ensure t
+  :mode "\\.go\\'"
+  :hook ((go-mode . (lambda ()
+                      (setq tab-width 4)
+                      (setq indent-tabs-mode t))))
+  :config
+  ;; gofmtの代わりにgoimportsを使用（自動import整理）
+  (setq gofmt-command "goimports"))
+```
+
+#### Haskell
+```emacs-lisp
+(use-package haskell-mode
+  :ensure t
+  :mode "\\.hs\\'"
+  :custom
+  (haskell-indentation-layout-offset 4)
+  (haskell-indentation-starter-offset 4)
+  (haskell-indentation-left-offset 4))
+```
+
+#### TypeScript/JavaScript
+```emacs-lisp
+;; TypeScript
+(use-package typescript-mode
+  :ensure t
+  :mode ("\\.ts\\'" "\\.tsx\\'")
+  :custom
+  (typescript-indent-level 2))
+
+;; JavaScript（標準のjs-modeを拡張）
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'"
+  :custom
+  (js2-basic-offset 2)
+  (js2-strict-missing-semi-warning nil))
+
+;; JSX/React サポート
+(use-package rjsx-mode
+  :ensure t
+  :mode ("\\.jsx\\'" "components\\/.*\\.js\\'"))
+```
+
+### マークアップ・スタイルシート言語
+
+#### Web開発（HTML/CSS）
+```emacs-lisp
+;; web-mode: HTML, CSS, JSXなどを統合サポート
+(use-package web-mode
+  :ensure t
+  :mode ("\\.html\\'" "\\.css\\'" "\\.scss\\'" "\\.sass\\'")
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-css-colorization t)
+  (web-mode-enable-current-element-highlight t))
+
+;; Emmet: HTML/CSSの高速コーディング
+(use-package emmet-mode
+  :ensure t
+  :hook ((web-mode . emmet-mode)
+         (html-mode . emmet-mode)
+         (css-mode . emmet-mode))
+  :config
+  (setq emmet-expand-jsx-className? t))  ; React対応
+```
+
+### データ形式
+
+#### JSON
+```emacs-lisp
+(use-package json-mode
+  :ensure t
+  :mode ("\\.json\\'" "\\.jsonc\\'")
+  :hook (json-mode . (lambda ()
+                       (setq-local js-indent-level 2))))
+```
+
+#### YAML
+```emacs-lisp
+(use-package yaml-mode
+  :ensure t
+  :mode ("\\.yml\\'" "\\.yaml\\'")
+  :hook (yaml-mode . (lambda ()
+                       (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+```
+
+### 共通設定
+
+#### フォーマッター統合
+```emacs-lisp
+;; format-all: 多言語対応の統一フォーマッター
+(use-package format-all
+  :ensure t
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode)
+  :config
+  ;; 保存時に自動フォーマット（オプション）
+  (setq-default format-all-formatters
+                '(("TypeScript" prettier)
+                  ("JavaScript" prettier)
+                  ("JSON" prettier)
+                  ("HTML" prettier)
+                  ("CSS" prettier)
+                  ("YAML" prettier)
+                  ("Go" goimports)
+                  ("Haskell" ormolu))))
+```
+
+#### Tree-sitter（構文ハイライト強化）
+```emacs-lisp
+;; Emacs 29+の場合、tree-sitterモードを有効化
+(when (and (fboundp 'treesit-available-p)
+           (treesit-available-p))
+  (setq treesit-language-source-alist
+        '((typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+          (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (json "https://github.com/tree-sitter/tree-sitter-json" "master" "src")
+          (css "https://github.com/tree-sitter/tree-sitter-css" "master" "src")
+          (html "https://github.com/tree-sitter/tree-sitter-html" "master" "src")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src")
+          (go "https://github.com/tree-sitter/tree-sitter-go" "master" "src")
+          (haskell "https://github.com/tree-sitter/tree-sitter-haskell" "master" "src"))))
+```
+
+### この章で得られたもの
+- ✅ Go, Haskell, TypeScript/JavaScript, HTML/CSS, JSON, YAMLの完全サポート
+- ✅ 各言語に最適化されたインデント設定
+- ✅ web-modeによる統合的なWeb開発環境
+- ✅ Emmetによる高速HTML/CSSコーディング
+- ✅ format-allによる統一的なコードフォーマット
+- ✅ Tree-sitterによる高精度な構文ハイライト（Emacs 29+）
+- ✅ 構造化された設定で新しい言語の追加が容易
+
+---
+
+[← 前の章](09_ui.md) | [目次](../README.md) | [次の章 →](11_performance.md)
