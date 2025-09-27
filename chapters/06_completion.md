@@ -41,6 +41,15 @@
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
+    :after general
+    :init
+    ;; SPCキーバインドを事前定義
+    (with-eval-after-load 'general
+      (leader-def
+        "/" '(consult-ripgrep :which-key "search project")
+        "s" '(:ignore t :which-key "search")
+        "s p" '(consult-ripgrep :which-key "search project")
+        "s l" '(consult-line :which-key "search lines")))
     :bind (("C-x b" . consult-buffer)
            ("C-x 4 b" . consult-buffer-other-window)
            ("M-y" . consult-yank-pop)
@@ -51,18 +60,7 @@
     :config
     ;; ripgrepの詳細設定
     (setopt consult-ripgrep-args
-            "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --search-zip")
-    ;; 検索関連キーバインド
-    (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC"
-        "/" '(consult-ripgrep :which-key "search project"))
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC s"
-        "p" '(consult-ripgrep :which-key "search project")
-        "l" '(consult-line :which-key "search lines"))))
+            "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --search-zip"))
 #+end_src
 
 ** VSCode風操作の実現
@@ -77,35 +75,26 @@
     :ensure t
     :init
     (projectile-mode 1)
-    :custom
-    (projectile-completion-system 'default)
-    (projectile-enable-caching t)
-    :config
     ;; プロジェクト関連キーバインド
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC p"
-        "p" '(consult-projectile-switch-project :which-key "switch project")
-        "r" '(projectile-replace :which-key "replace in project")
-        "R" '(projectile-replace-regexp :which-key "replace regexp"))))
+      (leader-def
+        "p r" '(projectile-replace :which-key "replace in project")
+        "p R" '(projectile-replace-regexp :which-key "replace regexp")))
+    :custom
+    (projectile-completion-system 'default)
+    (projectile-enable-caching t))
 
   ;; consult-projectile: consultとの統合
   (use-package consult-projectile
     :ensure t
-    :after (consult projectile)
-    :config
-    ;; consult-projectile固有のキーバインド
+    :after (consult projectile general)
+    :init
+    ;; SPCキーバインドを事前定義
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC"
-        ;; ファイル検索（Ctrl+P風）
-        "f p" '(consult-projectile-find-file :which-key "quick open"))
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC p"
-        "f" '(consult-projectile-find-file :which-key "find file"))))
+      (leader-def
+        "f p" '(consult-projectile :which-key "quick open")
+        "p f" '(consult-projectile-find-file :which-key "find file")
+        "p p" '(consult-projectile-switch-project :which-key "switch project"))))
 #+end_src
 
 *** プロジェクト内テキスト検索・置換（Cmd+Shift+F相当）
@@ -148,6 +137,7 @@
   (use-package evil-mc
     :ensure t
     :after evil
+    :defer t
     :config
     (global-evil-mc-mode 1))
 
@@ -155,19 +145,17 @@
   (with-eval-after-load 'general
     (general-define-key
      :states '(normal visual)
-     "C-d" 'evil-mc-make-and-goto-next-match  ; Ctrl+D: 次の同じ単語を選択
-     "C-S-d" 'evil-mc-skip-and-goto-next-match ; Ctrl+Shift+D: スキップして次へ
-     "C-M-d" 'evil-mc-make-all-cursors))      ; Ctrl+Alt+D: すべて選択
+     "C-d" 'evil-mc-make-and-goto-next-match      ; Ctrl+D: 次の同じ単語を選択
+     "C-S-d" 'evil-mc-skip-and-goto-next-match    ; Ctrl+Shift+D: スキップして次へ
+     "C-M-d" 'evil-mc-make-all-cursors))          ; Ctrl+Alt+D: すべて選択
 
   ;; マルチカーソル関連キーバインド
   (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC m"
-      "a" '(evil-mc-make-all-cursors :which-key "select all")
-      "n" '(evil-mc-make-and-goto-next-match :which-key "next match")
-      "p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
-      "q" '(evil-mc-undo-all-cursors :which-key "quit")))
+    (leader-def
+      "m a" '(evil-mc-make-all-cursors :which-key "select all")
+      "m n" '(evil-mc-make-and-goto-next-match :which-key "next match")
+      "m p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
+      "m q" '(evil-mc-undo-all-cursors :which-key "quit")))
 #+end_src
 
 ** Corfu（コード補完）
