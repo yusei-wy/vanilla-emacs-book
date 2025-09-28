@@ -74,6 +74,37 @@
     :config
     (editorconfig-mode 1))
 #+end_src
+
+** ファイルの外部変更を自動反映
+#+begin_src emacs-lisp
+  ;; グローバルに自動リバートを有効化
+  (global-auto-revert-mode 1)
+
+  ;; ファイル通知を使用（イベントドリブン）
+  (setq auto-revert-use-notify t)
+
+  ;; 通知のみに依存（ポーリング無効化で省電力）
+  (setq auto-revert-avoid-polling t)
+
+  ;; メッセージを表示しない（静かに更新）
+  (setq auto-revert-verbose nil)
+
+  ;; リモートファイルでは監視を無効化（ネットワーク負荷軽減）
+  (setq auto-revert-remote-files nil)
+
+  ;; フォーカス取得時の変更チェック
+  (add-function :after after-focus-change-function
+                (lambda ()
+                  (when (frame-focus-state)
+                    ;; フォーカス取得時に全バッファの変更をチェック
+                    (dolist (buffer (buffer-list))
+                      (with-current-buffer buffer
+                        (when (and buffer-file-name
+                                  (not (buffer-modified-p))
+                                  (file-exists-p buffer-file-name)
+                                  (not (verify-visited-file-modtime buffer)))
+                          (revert-buffer t t t)))))))
+#+end_src
 ```
 
 ### ✨ この章で得られたもの
