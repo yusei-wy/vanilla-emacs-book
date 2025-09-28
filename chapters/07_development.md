@@ -138,7 +138,8 @@
 
   (use-package treemacs-evil
     :after (treemacs evil)
-    :ensure t)
+    :ensure t
+    :defer t)
 #+end_src
 
 ** diff-hl（変更箇所の可視化）

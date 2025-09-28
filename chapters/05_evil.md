@@ -220,8 +220,8 @@ Vimの便利機能をEmacsでも使えるようにします。
   ;; undo-fu-session: 履歴の永続化（オプション）
   (use-package undo-fu-session
     :ensure t
-    :config
-    (global-undo-fu-session-mode)
+    :defer t
+    :hook (after-init . global-undo-fu-session-mode)
     :custom
     ;; Gitコミットメッセージなどは永続化しない
     (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))

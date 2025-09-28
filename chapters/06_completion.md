@@ -98,46 +98,13 @@
 #+end_src
 
 *** プロジェクト内テキスト検索・置換（Cmd+Shift+F相当）
-#+begin_src emacs-lisp
-  ;; wgrep: 検索結果を直接編集して一括置換
-  (use-package wgrep
-    :ensure t
-    :config
-    (setopt wgrep-auto-save-buffer t)        ; 変更を自動保存
-    (setopt wgrep-change-readonly-file t))   ; 読み取り専用ファイルも編集可能に
-
-  ;; embark: アクション実行フレームワーク
-  (use-package embark
-    :ensure t
-    :bind
-    (("C-." . embark-act)
-     ("C-;" . embark-dwim))
-    :init
-    ;; 検索結果でCを押すとoccurバッファを開く
-    (setopt prefix-help-command #'embark-prefix-help-command))
-
-  ;; embark-consult: embarkとconsultの統合
-  (use-package embark-consult
-    :ensure t
-    :after (embark consult)
-    :hook
-    (embark-collect-mode . consult-preview-at-point-mode))
-
-  ;; 使い方：
-  ;; 1. SPC / または SPC s p でプロジェクト内検索
-  ;; 2. C-c C-o で検索結果をoccurバッファに送る（consultのデフォルト）
-  ;; 3. e でwgrepモードに入る
-  ;; 4. 通常のEmacsコマンドで編集（複数ファイルを同時編集）
-  ;; 5. C-c C-c で変更を適用、C-c C-k でキャンセル
-  ;; 6. C-x s で変更したファイルを保存
-#+end_src
+検索はconsult-ripgrep（SPC /）、置換はprojectile-replace（SPC p r）で実現
 
 *** マルチカーソル（evil-mc）
 #+begin_src emacs-lisp
   (use-package evil-mc
     :ensure t
     :after evil
-    :defer t
     :config
     (global-evil-mc-mode 1))
 
@@ -168,6 +135,16 @@
     (corfu-auto-prefix 2)
     :init
     (global-corfu-mode))
+
+  ;; Cape: 追加の補完機能
+  (use-package cape
+    :ensure t
+    :after corfu
+    :config
+    ;; ファイルパス補完を追加
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    ;; 単語補完を追加
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev))
 #+end_src
 ```
 
@@ -179,7 +156,7 @@
 - ✅ プロジェクト内ファイル検索（Ctrl+P風）
 - ✅ マルチカーソル編集（Ctrl+D）
 - ✅ プロジェクト内テキスト検索・置換（Cmd+Shift+F相当）
-- ✅ wgrepによる検索結果の直接編集
+- ✅ ファイルパス補完（Cape）
 
 ---
 

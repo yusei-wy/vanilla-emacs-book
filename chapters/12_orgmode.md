@@ -77,7 +77,6 @@ WAIT  CANCELED  Archive
 ```emacs-lisp
 (use-package org
   :ensure nil  ; 組み込みパッケージ
-  :defer t
   :custom
   ;; 基本設定
   (org-startup-indented t)
