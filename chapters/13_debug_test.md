@@ -1,10 +1,10 @@
-[[file:12_orgmode.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]]
+[← 前の章へ](12_orgmode.md) | [目次に戻る](00_introduction.md)
 
 ---
 
 # 第12章：デバッグとテスト編 - 品質の追求
 
-[[file:12_orgmode.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]]
+[← 前の章へ](12_orgmode.md) | [目次に戻る](00_introduction.md)
 
 ---
 
@@ -383,4 +383,4 @@
 
 ---
 
-[[file:12_orgmode.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]]
+[← 前の章へ](12_orgmode.md) | [目次に戻る](00_introduction.md)

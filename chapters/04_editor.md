@@ -1,4 +1,4 @@
-[[file:03_package.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:05_evil.md][次の章へ →]]
+[← 前の章へ](03_package.md) | [目次に戻る](00_introduction.md) | [次の章へ →](05_evil.md)
 
 ---
 
@@ -144,4 +144,4 @@
 
 ---
 
-[[file:03_package.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:05_evil.md][次の章へ →]]
+[← 前の章へ](03_package.md) | [目次に戻る](00_introduction.md) | [次の章へ →](05_evil.md)

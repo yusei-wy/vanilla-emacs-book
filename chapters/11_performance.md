@@ -1,10 +1,10 @@
-[[file:10_languages.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:12_orgmode.md][次の章へ →]]
+[← 前の章へ](10_languages.md) | [目次に戻る](00_introduction.md) | [次の章へ →](12_orgmode.md)
 
 ---
 
 # 第10章：パフォーマンス最適化編 - 究極の高速化
 
-[[file:10_languages.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:12_orgmode.md][次の章へ →]]
+[← 前の章へ](10_languages.md) | [目次に戻る](00_introduction.md) | [次の章へ →](12_orgmode.md)
 
 ---
 
@@ -226,4 +226,4 @@ GCMH使用時: アイドル時に自動的にGC実行
 
 ---
 
-[[file:10_languages.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:12_orgmode.md][次の章へ →]]
+[← 前の章へ](10_languages.md) | [目次に戻る](00_introduction.md) | [次の章へ →](12_orgmode.md)

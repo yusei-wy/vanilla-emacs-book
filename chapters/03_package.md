@@ -1,4 +1,4 @@
-[[file:02_foundation.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:04_editor.md][次の章へ →]]
+[← 前の章へ](02_foundation.md) | [目次に戻る](00_introduction.md) | [次の章へ →](04_editor.md)
 
 ---
 
@@ -86,4 +86,4 @@ config.orgに追加：
 
 ---
 
-[[file:02_foundation.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:04_editor.md][次の章へ →]]
+[← 前の章へ](02_foundation.md) | [目次に戻る](00_introduction.md) | [次の章へ →](04_editor.md)

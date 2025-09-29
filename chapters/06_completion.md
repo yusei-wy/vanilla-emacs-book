@@ -1,4 +1,4 @@
-[[file:05_evil.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:07_development.md][次の章へ →]]
+[← 前の章へ](05_evil.md) | [目次に戻る](00_introduction.md) | [次の章へ →](07_development.md)
 
 ---
 
@@ -161,4 +161,4 @@
 
 ---
 
-[[file:05_evil.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:07_development.md][次の章へ →]]
+[← 前の章へ](05_evil.md) | [目次に戻る](00_introduction.md) | [次の章へ →](07_development.md)

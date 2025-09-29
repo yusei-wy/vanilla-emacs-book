@@ -1,10 +1,10 @@
-[[file:11_performance.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:13_debug_test.md][次の章へ →]]
+[← 前の章へ](11_performance.md) | [目次に戻る](00_introduction.md) | [次の章へ →](13_debug_test.md)
 
 ---
 
 # 第11章：Org-mode活用編 - 最強のドキュメントシステム
 
-[[file:11_performance.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:13_debug_test.md][次の章へ →]]
+[← 前の章へ](11_performance.md) | [目次に戻る](00_introduction.md) | [次の章へ →](13_debug_test.md)
 
 ---
 
@@ -318,4 +318,4 @@ WAIT  CANCELED  Archive
 
 ---
 
-[[file:11_performance.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:13_debug_test.md][次の章へ →]]
+[← 前の章へ](11_performance.md) | [目次に戻る](00_introduction.md) | [次の章へ →](13_debug_test.md)

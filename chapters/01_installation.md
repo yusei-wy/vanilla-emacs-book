@@ -1,4 +1,4 @@
-[[file:00_introduction.md][← 目次へ]] | [[file:02_foundation.md][次の章へ →]]
+[← 目次へ](00_introduction.md) | [次の章へ →](02_foundation.md)
 
 ---
 
@@ -70,4 +70,4 @@ emacs --version  # ターミナルから確認
 
 ---
 
-[[file:00_introduction.md][← 目次へ]] | [[file:02_foundation.md][次の章へ →]]
+[← 目次へ](00_introduction.md) | [次の章へ →](02_foundation.md)

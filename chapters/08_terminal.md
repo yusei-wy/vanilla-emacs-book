@@ -1,19 +1,20 @@
-[[file:07_development.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:09_ui.md][次の章へ →]]
+[← 前の章へ](07_development.md) | [目次に戻る](00_introduction.md) | [次の章へ →](09_ui.md)
 
 ---
 
-* 第7章：ターミナル統合編 - シェルとの完全融合
+# 第7章：ターミナル統合編 - シェルとの完全融合
 
-** 🎯 この章の目標
+### 🎯 この章の目標
 - 完全なターミナルエミュレータの統合
 - Emacs内でのシェル作業の効率化
 - コードとターミナルのシームレスな連携
 
-** 📝 実装内容
+### 📝 実装内容
 
-*** 第7章の設定：ターミナル統合
+```org
+* 第7章の設定：ターミナル統合
 
-**** Vterm（完全ターミナルエミュレーション）
+** Vterm（完全ターミナルエミュレーション）
 #+begin_src emacs-lisp
   (use-package vterm
     :ensure t
@@ -45,7 +46,7 @@
       "p" '(multi-vterm-prev :which-key "prev terminal")))
 #+end_src
 
-**** ターミナルとの連携強化
+** ターミナルとの連携強化
 #+begin_src emacs-lisp
   ;; vterm-toggle: 簡単なターミナル切り替え
   (use-package vterm-toggle
@@ -73,7 +74,7 @@
     (vterm-send-string text))
 #+end_src
 
-**** ターミナル便利機能
+** ターミナル便利機能
 #+begin_src emacs-lisp
   ;; 現在のディレクトリでVtermを開く
   (defun my/vterm-here ()
@@ -103,16 +104,17 @@
       "h" '(my/vterm-here :which-key "terminal here")
       "r" '(my/run-in-vterm :which-key "run command")))
 #+end_src
+```
 
-** 💡 使い方のヒント
+### 💡 使い方のヒント
 
-- *C-`*: ターミナルのトグル（表示/非表示）
-- *SPC o t*: 新しいターミナルを開く
-- *SPC o T*: 専用ターミナルのトグル
-- *SPC o h*: 現在のディレクトリでターミナルを開く
-- *Vterm内でC-c C-t*: Evilモードへ切り替え（テキスト選択用）
+- **C-`**: ターミナルのトグル（表示/非表示）
+- **SPC o t**: 新しいターミナルを開く
+- **SPC o T**: 専用ターミナルのトグル
+- **SPC o h**: 現在のディレクトリでターミナルを開く
+- **Vterm内でC-c C-t**: Evilモードへ切り替え（テキスト選択用）
 
-** ✨ この章で得られたもの
+### ✨ この章で得られたもの
 - ✅ 完全なターミナルエミュレーション
 - ✅ 複数ターミナルの管理機能
 - ✅ プロジェクトごとのターミナル分離
@@ -121,4 +123,4 @@
 
 ---
 
-[[file:07_development.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:09_ui.md][次の章へ →]]
+[← 前の章へ](07_development.md) | [目次に戻る](00_introduction.md) | [次の章へ →](09_ui.md)

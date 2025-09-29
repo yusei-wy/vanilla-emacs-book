@@ -1,4 +1,4 @@
-[[file:06_completion.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:08_terminal.md][次の章へ →]]
+[← 前の章へ](06_completion.md) | [目次に戻る](00_introduction.md) | [次の章へ →](08_terminal.md)
 
 ---
 
@@ -169,4 +169,4 @@
 
 ---
 
-[[file:06_completion.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:08_terminal.md][次の章へ →]]
+[← 前の章へ](06_completion.md) | [目次に戻る](00_introduction.md) | [次の章へ →](08_terminal.md)
