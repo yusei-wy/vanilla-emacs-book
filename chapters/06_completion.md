@@ -105,24 +105,21 @@
   (use-package evil-mc
     :ensure t
     :after evil
+    :init
+    (with-eval-after-load 'general
+      (general-define-key
+       :states '(normal visual)
+       "C-d" 'evil-mc-make-and-goto-next-match    ; 次の単語を選択
+       "C-S-d" 'evil-mc-skip-and-goto-next-match ; スキップして次へ
+       "C-M-d" 'evil-mc-make-all-cursors)        ; 全て選択
+
+      (leader-def
+        "m a" '(evil-mc-make-all-cursors :which-key "select all")
+        "m n" '(evil-mc-make-and-goto-next-match :which-key "next match")
+        "m p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
+        "m q" '(evil-mc-undo-all-cursors :which-key "quit")))
     :config
     (global-evil-mc-mode 1))
-
-  ;; VSCode風のキーバインド
-  (with-eval-after-load 'general
-    (general-define-key
-     :states '(normal visual)
-     "C-d" 'evil-mc-make-and-goto-next-match      ; Ctrl+D: 次の同じ単語を選択
-     "C-S-d" 'evil-mc-skip-and-goto-next-match    ; Ctrl+Shift+D: スキップして次へ
-     "C-M-d" 'evil-mc-make-all-cursors))          ; Ctrl+Alt+D: すべて選択
-
-  ;; マルチカーソル関連キーバインド
-  (with-eval-after-load 'general
-    (leader-def
-      "m a" '(evil-mc-make-all-cursors :which-key "select all")
-      "m n" '(evil-mc-make-and-goto-next-match :which-key "next match")
-      "m p" '(evil-mc-make-and-goto-prev-match :which-key "prev match")
-      "m q" '(evil-mc-undo-all-cursors :which-key "quit")))
 #+end_src
 
 ** Corfu（コード補完）
