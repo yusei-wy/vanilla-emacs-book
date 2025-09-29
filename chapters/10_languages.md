@@ -1,6 +1,10 @@
+[[file:09_ui.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:11_performance.md][次の章へ →]]
+
+---
+
 # 第9章：言語別設定編 - 各言語への最適化
 
-[← 前の章](09_ui.md) | [目次](../README.md) | [次の章 →](11_performance.md)
+[[file:09_ui.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:11_performance.md][次の章へ →]]
 
 ---
 
@@ -156,4 +160,4 @@
 
 ---
 
-[← 前の章](09_ui.md) | [目次](../README.md) | [次の章 →](11_performance.md)
+[[file:09_ui.md][← 前の章へ]] | [[file:00_introduction.md][目次に戻る]] | [[file:11_performance.md][次の章へ →]]
