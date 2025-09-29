@@ -31,17 +31,7 @@
            (web-mode . eglot-ensure)
            (json-mode . eglot-ensure)
            (yaml-mode . eglot-ensure))
-    :config
-    ;; LSPサーバーの設定
-    (setq eglot-autoshutdown t)  ; バッファを閉じたらLSPサーバーも終了
-    (setq eglot-sync-connect 0)  ; 非同期接続で高速化
-
-    ;; Format on Save（オプション）
-    ;; (add-hook 'before-save-hook
-    ;;           (lambda ()
-    ;;             (when (eglot-managed-p)
-    ;;               (eglot-format-buffer))))
-
+    :init
     ;; LSP関連キーバインド
     (with-eval-after-load 'general
       (general-def
@@ -52,7 +42,17 @@
         "r" '(eglot-rename :which-key "rename")
         "f" '(eglot-format :which-key "format")
         "d" '(xref-find-definitions :which-key "find definitions")
-        "R" '(xref-find-references :which-key "find references"))))
+        "R" '(xref-find-references :which-key "find references")))
+    :config
+    ;; LSPサーバーの設定
+    (setq eglot-autoshutdown t)  ; バッファを閉じたらLSPサーバーも終了
+    (setq eglot-sync-connect 0))  ; 非同期接続で高速化
+
+    ;; Format on Save（オプション）
+    ;; (add-hook 'before-save-hook
+    ;;           (lambda ()
+    ;;             (when (eglot-managed-p)
+    ;;               (eglot-format-buffer))))
 
   ;; 必要なLSPサーバーのインストール手順:
   ;; Go: go install golang.org/x/tools/gopls@latest
@@ -69,14 +69,7 @@
   (use-package flymake
     :ensure nil  ; 組み込みパッケージ
     :hook (prog-mode . flymake-mode)
-    :config
-    (setq flymake-no-changes-timeout 0.5)  ; 変更後0.5秒でチェック
-    (setq flymake-start-syntax-check-on-newline t)
-    (setq flymake-merge-all-diagnostics t)
-
-    ;; エラー表示の改善
-    (setq flymake-fringe-indicator-position 'left-fringe)
-
+    :init
     ;; エラーチェック関連キーバインド
     (with-eval-after-load 'general
       (general-def
@@ -85,7 +78,14 @@
         "n" '(flymake-goto-next-error :which-key "next error")
         "p" '(flymake-goto-prev-error :which-key "prev error")
         "l" '(flymake-show-buffer-diagnostics :which-key "list errors")
-        "L" '(flymake-show-project-diagnostics :which-key "project errors"))))
+        "L" '(flymake-show-project-diagnostics :which-key "project errors")))
+    :config
+    (setq flymake-no-changes-timeout 0.5)  ; 変更後0.5秒でチェック
+    (setq flymake-start-syntax-check-on-newline t)
+    (setq flymake-merge-all-diagnostics t)
+
+    ;; エラー表示の改善
+    (setq flymake-fringe-indicator-position 'left-fringe))
 #+end_src
 
 *** オプション：Flycheck（より多くの言語サポートが必要な場合）
@@ -113,7 +113,7 @@
   (use-package magit
     :ensure t
     :bind (("C-x g" . magit-status))
-    :config
+    :init
     ;; Git関連キーバインド
     (with-eval-after-load 'general
       (general-def
@@ -129,16 +129,17 @@
   (use-package treemacs
     :ensure t
     :defer t
-    :config
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-git-mode 'deferred)
+    :init
     ;; Treemacs関連キーバインド
     (with-eval-after-load 'general
       (general-def
         :states '(normal visual)
         :prefix "SPC o"
-        "p" '(treemacs :which-key "project tree"))))
+        "p" '(treemacs :which-key "project tree")))
+    :config
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-git-mode 'deferred))
 
   (use-package treemacs-evil
     :after (treemacs evil)

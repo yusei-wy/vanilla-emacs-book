@@ -45,7 +45,6 @@
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
-    :after general
     :init
     ;; SPCキーバインドを事前定義
     (with-eval-after-load 'general
@@ -91,7 +90,7 @@
   ;; consult-projectile: consultとの統合
   (use-package consult-projectile
     :ensure t
-    :after (consult projectile general)
+    :after (consult projectile)
     :init
     ;; SPCキーバインドを事前定義
     (with-eval-after-load 'general

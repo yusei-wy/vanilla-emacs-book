@@ -211,15 +211,16 @@ Vimの便利機能をEmacsでも使えるようにします。
     :custom
     ;; デフォルトの3では履歴ツリーが見切れるため増やす
     (vundo-window-max-height 10)
-    :config
-    ;; Unicodeシンボルで美しく表示
-    (setq vundo-glyph-alist vundo-unicode-symbols)
+    :init
     ;; vundo関連キーバインド
     (with-eval-after-load 'general
       (general-def
         :states '(normal visual)
         :prefix "SPC"
-        "u" '(vundo :which-key "undo tree visualizer"))))
+        "u" '(vundo :which-key "undo tree visualizer")))
+    :config
+    ;; Unicodeシンボルで美しく表示
+    (setq vundo-glyph-alist vundo-unicode-symbols))
 
   ;; undo-fu-session: 履歴の永続化（オプション）
   (use-package undo-fu-session
