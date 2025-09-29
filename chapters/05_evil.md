@@ -214,9 +214,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     :init
     ;; vundo関連キーバインド
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC"
+      (leader-def
         "u" '(vundo :which-key "undo tree visualizer")))
     :config
     ;; Unicodeシンボルで美しく表示
