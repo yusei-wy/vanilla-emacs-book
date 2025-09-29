@@ -615,4 +615,95 @@ UI/テーマ:        0.10秒（最終段階）
 
 ---
 
+## 15. 第6章補完システムの技術的課題と解決策
+
+### 🔴 発見された課題
+
+#### 1. **Elpaca環境での:generalキーワード問題**
+- **症状**: `use-package`の`:general`キーワードが認識されずエラー
+- **原因**: Elpacaはパッケージを非同期でロードするため、generalが未ロードの状態で`:general`キーワードを使おうとする
+- **根拠**: エラーメッセージ「Unrecognized keyword: :general」
+
+#### 2. **キーバインドの上書き懸念**
+- **問題**: 同じキーを複数回定義すると後の設定が前を上書き
+- **例**: `SPC p f`を2箇所で定義したら最後の定義のみ有効
+- **現状**: 現在は異なるキーなので問題なし
+
+#### 3. **設定の分散による保守性低下**
+- **問題**: `with-eval-after-load`が各パッケージに散在
+- **影響**: キーバインドの全体像が把握しづらい
+
+### 🎯 なぜ変更が必要か
+
+1. **エラー解消**: 現在consultのsearch機能が動作しない
+2. **将来性**: config.orgに統合時も正常動作を保証
+3. **保守性**: キーバインドの重複や競合を防ぐ
+4. **一貫性**: 他章（05_evil.md、07_development.md）と同じパターンに統一
+
+### ✅ 完成条件
+
+#### 必須要件
+- [ ] consult-ripgrepが`SPC /`で正常に動作する
+- [ ] projectile関連コマンドがすべて動作する
+- [ ] evil-mcのマルチカーソルが機能する
+- [ ] which-keyの説明が正しく表示される
+- [ ] Elpaca環境でエラーなく起動する
+
+#### 技術要件
+- [ ] `:general`キーワードを使わない（Elpaca環境のため）
+- [ ] `with-eval-after-load 'general`パターンで統一
+- [ ] 同一プレフィックスのキーバインドが重複しない
+- [ ] config.orgへの統合時も動作保証
+
+### 📝 解決策
+
+#### 最終的な実装方針
+1. **すべて`with-eval-after-load 'general`で統一**
+   - 05_evil.md、07_development.mdと同じパターン
+   - Elpaca環境でも確実に動作
+   - which-key説明も機能
+
+2. **キーバインドの明確化**
+   ```elisp
+   ;; 各パッケージで個別に定義（現在の修正版）
+   (with-eval-after-load 'general
+     (general-def
+       :states '(normal visual)
+       :prefix "SPC p"
+       "r" '(projectile-replace :which-key "replace")
+       ...))
+   ```
+
+3. **将来的な拡張性**
+   - generalに`:wait t`を追加すれば`:general`キーワードも使用可能
+   - ただし現時点では`with-eval-after-load`が最も確実
+
+### 🔄 実装の流れ
+
+```mermaid
+graph TD
+    A[05_evil.mdでgeneral定義] --> B[generalがロードされる]
+    B --> C[06_completion.mdが読み込まれる]
+    C --> D[with-eval-after-loadが実行待機]
+    D --> E[generalロード完了後に実行]
+    E --> F[キーバインドが正常に設定]
+```
+
+### 📊 変更のまとめ
+
+| 項目 | 変更前 | 変更後 | 理由 |
+|------|--------|--------|------|
+| consult | `:general`キーワード | `with-eval-after-load` | Elpaca対応 |
+| projectile | `:general`キーワード | `with-eval-after-load` | 統一性 |
+| consult-projectile | `:general`キーワード | `with-eval-after-load` | 統一性 |
+| evil-mc | `:general`キーワード | `with-eval-after-load` | 統一性 |
+
+### 📅 次のステップ
+
+1. **即座**: 06_completion.mdの修正版を適用
+2. **テスト**: Elpaca環境で動作確認
+3. **将来**: generalに`:wait t`追加を検討（全章で`:general`使用可能に）
+
+---
+
 根拠：この計画は、あなたの要望（起動速度重視、VSCodeライク、段階的移行、Format on Save、VSCode Timeline相当のバックアップ）をすべて満たし、Doom Emacsの良い部分を維持しつつ、完全に制御可能な環境を実現します。

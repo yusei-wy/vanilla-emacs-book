@@ -72,13 +72,12 @@
     :init
     ;; エラーチェック関連キーバインド
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC e"
-        "n" '(flymake-goto-next-error :which-key "next error")
-        "p" '(flymake-goto-prev-error :which-key "prev error")
-        "l" '(flymake-show-buffer-diagnostics :which-key "list errors")
-        "L" '(flymake-show-project-diagnostics :which-key "project errors")))
+      (leader-def
+        "e" '(:ignore t :which-key "errors")
+        "e n" '(flymake-goto-next-error :which-key "next error")
+        "e p" '(flymake-goto-prev-error :which-key "prev error")
+        "e l" '(flymake-show-buffer-diagnostics :which-key "list errors")
+        "e L" '(flymake-show-project-diagnostics :which-key "project errors")))
     :config
     (setq flymake-no-changes-timeout 0.5)  ; 変更後0.5秒でチェック
     (setq flymake-start-syntax-check-on-newline t)
@@ -116,12 +115,11 @@
     :init
     ;; Git関連キーバインド
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC g"
-        "g" '(magit-status :which-key "status")
-        "b" '(magit-blame :which-key "blame")
-        "l" '(magit-log :which-key "log"))))
+      (leader-def
+        "g" '(:ignore t :which-key "git")
+        "g g" '(magit-status :which-key "status")
+        "g b" '(magit-blame :which-key "blame")
+        "g l" '(magit-log :which-key "log"))))
 #+end_src
 
 ** Treemacs（ファイルツリー）
@@ -132,10 +130,9 @@
     :init
     ;; Treemacs関連キーバインド
     (with-eval-after-load 'general
-      (general-def
-        :states '(normal visual)
-        :prefix "SPC o"
-        "p" '(treemacs :which-key "project tree")))
+      (leader-def
+        "o" '(:ignore t :which-key "open")
+        "o p" '(treemacs :which-key "project tree")))
     :config
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)

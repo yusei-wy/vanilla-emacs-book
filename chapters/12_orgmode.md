@@ -116,12 +116,11 @@ WAIT  CANCELED  Archive
 
 ;; Org-mode関連キーバインド
 (with-eval-after-load 'general
-  (general-def
-    :states '(normal visual)
-    :prefix "SPC n"
-    "n" '(org-capture :which-key "capture")
-    "a" '(org-agenda :which-key "agenda")
-    "l" '(org-store-link :which-key "store link")))
+  (leader-def
+    "n" '(:ignore t :which-key "notes")
+    "n n" '(org-capture :which-key "capture")
+    "n a" '(org-agenda :which-key "agenda")
+    "n l" '(org-store-link :which-key "store link")))
 ```
 
 ### Org-agenda（GTDタスク管理）

@@ -206,13 +206,12 @@ GCMH使用時: アイドル時に自動的にGC実行
 ### カスタムコマンド
 ```emacs-lisp
 (with-eval-after-load 'general
-  (general-def
-    :states '(normal visual)
-    :prefix "SPC h"
-    "b" '(my/benchmark-init :which-key "benchmark startup")
-    "p" '(my/show-package-stats :which-key "package stats")
-    "m" '(my/memory-usage :which-key "memory usage")
-    "t" '(my/time-package-loads :which-key "time packages")))
+  (leader-def
+    "h" '(:ignore t :which-key "help")
+    "h b" '(my/benchmark-init :which-key "benchmark startup")
+    "h p" '(my/show-package-stats :which-key "package stats")
+    "h m" '(my/memory-usage :which-key "memory usage")
+    "h t" '(my/time-package-loads :which-key "time packages")))
 ```
 
 ### この章で得られたもの

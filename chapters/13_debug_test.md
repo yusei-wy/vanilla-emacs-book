@@ -109,22 +109,21 @@
 
 ;; デバッグ関連キーバインド
 (with-eval-after-load 'general
-  (general-def
-    :states '(normal visual)
-    :prefix "SPC d"
-    "d" '(dap-debug :which-key "start debug")
-    "n" '(dap-next :which-key "next")
-    "i" '(dap-step-in :which-key "step in")
-    "o" '(dap-step-out :which-key "step out")
-    "c" '(dap-continue :which-key "continue")
-    "r" '(dap-restart-frame :which-key "restart")
-    "q" '(dap-quit :which-key "quit")
-    "b" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
-    "B" '(dap-ui-breakpoints :which-key "list breakpoints")
-    "e" '(dap-eval :which-key "eval")
-    "E" '(dap-eval-thing-at-point :which-key "eval at point")
-    "l" '(dap-ui-locals :which-key "locals")
-    "s" '(dap-ui-sessions :which-key "sessions")))
+  (leader-def
+    "d" '(:ignore t :which-key "debug")
+    "d d" '(dap-debug :which-key "start debug")
+    "d n" '(dap-next :which-key "next")
+    "d i" '(dap-step-in :which-key "step in")
+    "d o" '(dap-step-out :which-key "step out")
+    "d c" '(dap-continue :which-key "continue")
+    "d r" '(dap-restart-frame :which-key "restart")
+    "d q" '(dap-quit :which-key "quit")
+    "d b" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
+    "d B" '(dap-ui-breakpoints :which-key "list breakpoints")
+    "d e" '(dap-eval :which-key "eval")
+    "d E" '(dap-eval-thing-at-point :which-key "eval at point")
+    "d l" '(dap-ui-locals :which-key "locals")
+    "d s" '(dap-ui-sessions :which-key "sessions")))
 ```
 
 ### テストフレームワーク統合

@@ -37,13 +37,11 @@
 
   ;; ターミナル関連キーバインド
   (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC o"
-      "t" '(multi-vterm :which-key "terminal")
-      "T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
-      "n" '(multi-vterm-next :which-key "next terminal")
-      "p" '(multi-vterm-prev :which-key "prev terminal")))
+    (leader-def
+      "o t" '(multi-vterm :which-key "terminal")
+      "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
+      "o n" '(multi-vterm-next :which-key "next terminal")
+      "o p" '(multi-vterm-prev :which-key "prev terminal")))
 #+end_src
 
 ** ターミナルとの連携強化
@@ -98,11 +96,9 @@
 
   ;; ターミナル便利機能のキーバインド
   (with-eval-after-load 'general
-    (general-def
-      :states '(normal visual)
-      :prefix "SPC o"
-      "h" '(my/vterm-here :which-key "terminal here")
-      "r" '(my/run-in-vterm :which-key "run command")))
+    (leader-def
+      "o h" '(my/vterm-here :which-key "terminal here")
+      "o r" '(my/run-in-vterm :which-key "run command")))
 #+end_src
 ```
 
