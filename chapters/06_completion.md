@@ -12,9 +12,9 @@
 ### 📝 実装内容
 
 ```org
-* 第5章の設定：補完システム
+* completion
 
-** Vertico（縦型補完UI）
+** vertico-stack
 #+begin_src emacs-lisp
   (use-package vertico
     :ensure t
@@ -24,7 +24,7 @@
     (vertico-cycle t))
 #+end_src
 
-** Orderless（柔軟な補完スタイル）
+*** orderless
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
@@ -33,7 +33,7 @@
     (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
-** Marginalia（補完候補の追加情報）
+*** marginalia
 #+begin_src emacs-lisp
   (use-package marginalia
     :ensure t
@@ -41,7 +41,7 @@
     (marginalia-mode))
 #+end_src
 
-** Consult（検索と移動の強化 - 統合版）
+** consult
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
@@ -66,12 +66,7 @@
             "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --search-zip"))
 #+end_src
 
-** VSCode風操作の実現
-
-*** コマンドパレット（M-x強化）
-コマンドパレット機能は基本キーバインド（第4章）で設定済み
-
-*** プロジェクトファイル検索（Cmd+P相当）
+** project
 #+begin_src emacs-lisp
   ;; projectile: プロジェクト管理
   (use-package projectile
@@ -100,10 +95,7 @@
         "p p" '(consult-projectile-switch-project :which-key "switch project"))))
 #+end_src
 
-*** プロジェクト内テキスト検索・置換（Cmd+Shift+F相当）
-検索はconsult-ripgrep（SPC /）、置換はprojectile-replace（SPC p r）で実現
-
-*** マルチカーソル（evil-mc）
+** multiple-cursors
 #+begin_src emacs-lisp
   (use-package evil-mc
     :ensure t
@@ -125,7 +117,7 @@
     (global-evil-mc-mode 1))
 #+end_src
 
-** Corfu（コード補完）
+** corfu
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure t

@@ -12,9 +12,30 @@
 ### 📝 実装内容
 
 ```org
-* 第3章の設定：基本的な使いやすさ
+* ui
 
-** フォント設定
+見た目と表示に関する設定。テーマ、フォント、行番号、カーソル位置の記憶など。
+
+** theme
+
+*** transient
+
+magit の依存パッケージ。Emacs 組み込みの古い transient を回避し、GitHub から最新版を取得。
+
+#+begin_src emacs-lisp
+  (use-package transient
+    :ensure (:fetcher github :repo "magit/transient"))
+#+end_src
+
+*** doom-themes
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (load-theme 'doom-nord-aurora t))
+#+end_src
+
+** font
 #+begin_src emacs-lisp
   ;; フォント設定
   (when (member "Monaspace Neon" (font-family-list))
@@ -23,13 +44,15 @@
                         :height 130))
 #+end_src
 
-** 行番号とカーソル行のハイライト
+** visual
+
+*** 行番号とカーソル行のハイライト
 #+begin_src emacs-lisp
-  (global-display-line-numbers-mode 1)
+  ;; (global-display-line-numbers-mode 1)
   (global-hl-line-mode 1)
 #+end_src
 
-** カーソル位置の記憶
+*** カーソル位置の記憶
 #+begin_src emacs-lisp
   (use-package saveplace
     :ensure nil
@@ -38,9 +61,27 @@
     (save-place-file (locate-user-emacs-file "places")))
 #+end_src
 
-** Editor補助機能
+** vc-gutter
 
-*** 括弧の自動補完
+*** diff-hl
+
+変更箇所をリアルタイムで可視化。
+
+#+begin_src emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :demand t
+    :hook (dired-mode . diff-hl-dired-mode)
+    :config
+    (global-diff-hl-mode)
+    (diff-hl-flydiff-mode))
+#+end_src
+
+* editor
+
+エディタ機能の強化。括弧操作、ウィンドウ移動、便利機能など。
+
+** parens
 #+begin_src emacs-lisp
   (use-package smartparens
     :ensure t
@@ -51,7 +92,9 @@
     (smartparens-global-mode t))  ; グローバルに有効化
 #+end_src
 
-*** ace-window（ウィンドウ移動）
+** window
+
+*** ace-window
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
@@ -60,7 +103,9 @@
     (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+end_src
 
-*** helpful（詳細なヘルプ）
+** utils
+
+*** helpful
 #+begin_src emacs-lisp
   (use-package helpful
     :ensure t
@@ -72,14 +117,14 @@
     ("C-h C" . helpful-command))
 #+end_src
 
-*** expand-region（選択範囲の拡張）
+*** expand-region
 #+begin_src emacs-lisp
   (use-package expand-region
     :ensure t
     :bind ("C-=" . er/expand-region))
 #+end_src
 
-*** editorconfig（プロジェクト設定）
+*** editorconfig
 #+begin_src emacs-lisp
   (use-package editorconfig
     :ensure t
@@ -88,24 +133,17 @@
     (editorconfig-mode 1))
 #+end_src
 
-** ファイルの外部変更を自動反映
+*** auto-revert
+
+ファイルの外部変更を自動反映。
+
 #+begin_src emacs-lisp
-  ;; グローバルに自動リバートを有効化
   (global-auto-revert-mode 1)
-
-  ;; ファイル通知を使用（イベントドリブン）
   (setq auto-revert-use-notify t)
-
-  ;; 通知のみに依存（ポーリング無効化で省電力）
   (setq auto-revert-avoid-polling t)
-
-  ;; メッセージを表示しない（静かに更新）
   (setq auto-revert-verbose nil)
-
-  ;; リモートファイルでは監視を無効化（ネットワーク負荷軽減）
   (setq auto-revert-remote-files nil)
 
-  ;; フォーカス取得時の変更チェック
   (add-function :after after-focus-change-function
                 (lambda ()
                   (when (frame-focus-state)

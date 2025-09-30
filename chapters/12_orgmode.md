@@ -77,8 +77,22 @@ WAIT  CANCELED  Archive
 
 ## 第11章の設定：Org-mode活用
 
-### 基本設定とキーバインド
-```emacs-lisp
+```org
+* lang
+
+** org
+
+*** org-tempo
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (with-eval-after-load 'org
+    (add-to-list 'org-structure-template-alist
+                 '("el" . "src emacs-lisp")))
+#+end_src
+
+*** 基本設定とキーバインド
+#+begin_src emacs-lisp
 (use-package org
   :ensure nil  ; 組み込みパッケージ
   :custom
@@ -283,6 +297,7 @@ WAIT  CANCELED  Archive
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+#+end_src
 ```
 
 ## 使い方のヒント

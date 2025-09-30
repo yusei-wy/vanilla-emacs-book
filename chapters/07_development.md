@@ -12,11 +12,11 @@
 ### 📝 実装内容
 
 ```org
-* 第6章の設定：開発環境
+* lang
 
-** エラーチェックとLSP設定
+** lsp
 
-*** Eglot（組み込みLSPクライアント）
+*** eglot
 #+begin_src emacs-lisp
   ;; Emacs 29+では組み込みのEglotを使用
   (use-package eglot
@@ -45,14 +45,14 @@
         "R" '(xref-find-references :which-key "find references")))
     :config
     ;; LSPサーバーの設定
-    (setq eglot-autoshutdown t)  ; バッファを閉じたらLSPサーバーも終了
-    (setq eglot-sync-connect 0))  ; 非同期接続で高速化
+    (setq eglot-autoshutdown t)
+    (setq eglot-sync-connect 0))
 
-    ;; Format on Save（オプション）
-    ;; (add-hook 'before-save-hook
-    ;;           (lambda ()
-    ;;             (when (eglot-managed-p)
-    ;;               (eglot-format-buffer))))
+  ;; Format on save
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (eglot-managed-p)
+                (eglot-format-buffer))))
 
   ;; 必要なLSPサーバーのインストール手順:
   ;; Go: go install golang.org/x/tools/gopls@latest
@@ -63,7 +63,9 @@
   ;; YAML: npm install -g yaml-language-server
 #+end_src
 
-*** Flymake（組み込みエラーチェッカー）
+** checkers
+
+*** flymake
 #+begin_src emacs-lisp
   ;; Flymakeの基本設定（Eglotと自動連携）
   (use-package flymake
@@ -87,27 +89,9 @@
     (setq flymake-fringe-indicator-position 'left-fringe))
 #+end_src
 
-*** オプション：Flycheck（より多くの言語サポートが必要な場合）
-#+begin_src emacs-lisp
-  ;; LSPが利用できない言語や追加のチェッカーが必要な場合のみ有効化
-  ;; コメントアウトを外して使用
+* tools
 
-  ;; (use-package flycheck
-  ;;   :ensure t
-  ;;   :init (global-flycheck-mode)
-  ;;   :config
-  ;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  ;;   (setq flycheck-display-errors-delay 0.3))
-
-  ;; ;; EglotとFlycheckを連携させる場合
-  ;; (use-package flycheck-eglot
-  ;;   :ensure t
-  ;;   :after (flycheck eglot)
-  ;;   :config
-  ;;   (global-flycheck-eglot-mode 1))
-#+end_src
-
-** Magit（Git統合）
+** magit
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
@@ -122,7 +106,7 @@
         "g l" '(magit-log :which-key "log"))))
 #+end_src
 
-** Treemacs（ファイルツリー）
+** treemacs
 #+begin_src emacs-lisp
   (use-package treemacs
     :ensure t
@@ -142,16 +126,12 @@
     :after (treemacs evil)
     :ensure t
     :defer t)
-#+end_src
 
-** diff-hl（変更箇所の可視化）
-#+begin_src emacs-lisp
-  (use-package diff-hl
+  (use-package treemacs-nerd-icons
     :ensure t
-    :hook ((prog-mode . diff-hl-mode)
-           (dired-mode . diff-hl-dired-mode))
+    :after (treemacs nerd-icons)
     :config
-    (diff-hl-flydiff-mode))
+    (treemacs-load-theme "nerd-icons"))
 #+end_src
 ```
 

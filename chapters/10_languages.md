@@ -15,6 +15,11 @@
 
 ## 第9章の設定：言語別カスタマイズ
 
+```org
+* lang
+
+** languages
+
 ### プログラミング言語
 
 #### Go言語
@@ -177,6 +182,7 @@
           (yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src")
           (go "https://github.com/tree-sitter/tree-sitter-go" "master" "src")
           (haskell "https://github.com/tree-sitter/tree-sitter-haskell" "master" "src"))))
+```
 ```
 
 ### この章で得られたもの

@@ -14,10 +14,11 @@
 config.orgに追加：
 
 ```org
-* 第2章の設定：パッケージ管理
+* core
 
-** Elpacaのブートストラップ
-なぜElpaca？ → 非同期処理で高速、straight.elの後継
+** packages
+
+*** elpaca bootstrap
 
 #+begin_src emacs-lisp
   (defvar elpaca-installer-version 0.11)
@@ -60,14 +61,13 @@ config.orgに追加：
   (elpaca `(,@elpaca-order))
 #+end_src
 
-** use-package統合
+*** use-package binding
 #+begin_src emacs-lisp
   (elpaca elpaca-use-package
     (elpaca-use-package-mode))
 #+end_src
 
-** 最初のパッケージ：which-key
-画面下部にキーバインドのヘルプを表示
+*** which-key
 
 #+begin_src emacs-lisp
   (use-package which-key

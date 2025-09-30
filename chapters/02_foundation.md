@@ -136,9 +136,11 @@ touch early-init.el init.el config.org
 #+AUTHOR: y.kasa
 #+PROPERTY: header-args:emacs-lisp :tangle yes :mkdirp yes
 
-* 基盤設定
+* core
 
-** macOS固有設定
+Emacsの基礎設定。OS固有設定、文字コード、バックアップ、パフォーマンス最適化など。
+
+** os
 #+begin_src emacs-lisp
   ;; macOSでのMetaキー設定（日本語ユーザー向け）
   (when (eq system-type 'darwin)
@@ -155,13 +157,13 @@ touch early-init.el init.el config.org
   ;; (setq mac-right-option-modifier 'none)   ; 右Option = 特殊文字入力用
 #+end_src
 
-** エンコーディング
+** encoding
 #+begin_src emacs-lisp
   (set-language-environment "UTF-8")
   (prefer-coding-system 'utf-8)
 #+end_src
 
-** バックアップ設定
+** backup
 #+begin_src emacs-lisp
   (use-package emacs
     :custom
@@ -178,12 +180,28 @@ touch early-init.el init.el config.org
     (vc-make-backup-files t))
 #+end_src
 
-** パフォーマンス最適化
+** performance
 #+begin_src emacs-lisp
   ;; 大きなファイルの警告閾値
   (setq large-file-warning-threshold (* 100 1024 1024))  ; 100MB
   ;; 読み込みプロセスの最適化
   (setq read-process-output-max (* 1024 1024))  ; 1MB
+#+end_src
+
+** bugfix
+
+*** org-mode のコードブロック内 indent 問題
+org-mode emacs-lisp のコードブロックで改行時に発生する意図しない indent を抑制。
+
+#+begin_src emacs-lisp
+  ;; (setq org-src-preserve-indentation t)
+#+end_src
+
+*** シンボリックリンクファイルの確認を無効化
+Git管理下のファイルへのシンボリックリンクを開くたびに確認ダイアログが表示される問題を解決。
+
+#+begin_src emacs-lisp
+  (setq vc-follow-symlinks t)
 #+end_src
 ```
 

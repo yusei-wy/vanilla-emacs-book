@@ -64,9 +64,9 @@
 ```
 
 ```org
-* 第4章の設定：Vimキーバインド
+* editor
 
-** Evil（Vimエミュレーション）
+** evil
 #+begin_src emacs-lisp
   (use-package evil
     :ensure t
@@ -80,16 +80,14 @@
     (evil-mode 1))
 #+end_src
 
-** 日本語入力（IME）の自動制御
+*** IME の自動制御
 #+begin_src emacs-lisp
-  ;; macOS: Normal State移行時にIMEを自動的にオフ
   (when (eq system-type 'darwin)
     (use-package evil
       :hook (evil-normal-state-entry-hook . mac-change-language-to-us)))
 #+end_src
 
-** Evil拡張プラグイン（必須）
-Vimの便利機能をEmacsでも使えるようにします。
+*** evil extensions
 
 #+begin_src emacs-lisp
   ;; evil-collection: Evil未対応モードにVimキーバインド追加
@@ -150,7 +148,7 @@ Vimの便利機能をEmacsでも使えるようにします。
     (evil-escape-delay 0.2))
 #+end_src
 
-** リーダーキー（SPCキー）の設定
+** leader key (SPC)
 #+begin_src emacs-lisp
   (use-package general
     :ensure t
@@ -192,8 +190,7 @@ Vimの便利機能をEmacsでも使えるようにします。
       "b k" '(kill-this-buffer :which-key "kill buffer")))
 #+end_src
 
-** Undo/Redo機能（より安定的な実装）
-従来のundo-treeには履歴破損の問題があるため、より安定的な組み合わせを使用します。
+** undo
 
 #+begin_src emacs-lisp
   ;; undo-fu: シンプルで安定したundo/redo
