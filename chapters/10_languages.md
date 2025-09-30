@@ -110,6 +110,36 @@
                        (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
 ```
 
+#### Markdown
+```emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode))
+  :custom
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-command "markdown"))
+
+(use-package markdown-preview-mode
+  :ensure t
+  :after markdown-mode
+  :custom
+  (markdown-preview-stylesheets
+   (list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css"))
+  :config
+  (with-eval-after-load 'general
+    (general-define-key
+     :states '(normal visual)
+     :keymaps 'markdown-mode-map
+     :prefix "SPC"
+     "m" '(:ignore t :which-key "markdown")
+     "mp" '(markdown-preview-mode :which-key "toggle preview")
+     "mo" '(markdown-preview-open-browser :which-key "open in browser")
+     "ml" '(markdown-insert-link :which-key "insert link")
+     "mi" '(markdown-insert-image :which-key "insert image")
+     "mc" '(markdown-insert-gfm-code-block :which-key "insert code block"))))
+```
+
 ### 共通設定
 
 #### フォーマッター統合
@@ -150,10 +180,12 @@
 ```
 
 ### この章で得られたもの
-- ✅ Go, Haskell, TypeScript/JavaScript, HTML/CSS, JSON, YAMLの完全サポート
+- ✅ Go, Haskell, TypeScript/JavaScript, HTML/CSS, JSON, YAML, Markdownの完全サポート
 - ✅ 各言語に最適化されたインデント設定
 - ✅ web-modeによる統合的なWeb開発環境
 - ✅ Emmetによる高速HTML/CSSコーディング
+- ✅ Markdownのリアルタイムプレビュー（GitHub風スタイル）
+- ✅ `SPC m`でMarkdown編集機能に素早くアクセス
 - ✅ format-allによる統一的なコードフォーマット
 - ✅ Tree-sitterによる高精度な構文ハイライト（Emacs 29+）
 - ✅ 構造化された設定で新しい言語の追加が容易
