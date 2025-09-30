@@ -21,6 +21,7 @@
   ;; Emacs 29+では組み込みのEglotを使用
   (use-package eglot
     :ensure nil  ; 組み込みパッケージ
+    :after general
     :hook ((go-mode . eglot-ensure)
            (typescript-mode . eglot-ensure)
            (js-mode . eglot-ensure)
@@ -31,7 +32,10 @@
            (web-mode . eglot-ensure)
            (json-mode . eglot-ensure)
            (yaml-mode . eglot-ensure))
-    :init
+    :config
+    (setq eglot-autoshutdown t)
+    (setq eglot-sync-connect 0)
+
     ;; LSP関連キーバインド
     (with-eval-after-load 'general
       (general-def
@@ -42,11 +46,7 @@
         "r" '(eglot-rename :which-key "rename")
         "f" '(eglot-format :which-key "format")
         "d" '(xref-find-definitions :which-key "find definitions")
-        "R" '(xref-find-references :which-key "find references")))
-    :config
-    ;; LSPサーバーの設定
-    (setq eglot-autoshutdown t)
-    (setq eglot-sync-connect 0))
+        "R" '(xref-find-references :which-key "find references"))))
 
   ;; Format on save
   (add-hook 'before-save-hook
@@ -70,23 +70,23 @@
   ;; Flymakeの基本設定（Eglotと自動連携）
   (use-package flymake
     :ensure nil  ; 組み込みパッケージ
+    :after general
     :hook (prog-mode . flymake-mode)
-    :init
-    ;; エラーチェック関連キーバインド
-    (with-eval-after-load 'general
-      (leader-def
-        "e" '(:ignore t :which-key "errors")
-        "e n" '(flymake-goto-next-error :which-key "next error")
-        "e p" '(flymake-goto-prev-error :which-key "prev error")
-        "e l" '(flymake-show-buffer-diagnostics :which-key "list errors")
-        "e L" '(flymake-show-project-diagnostics :which-key "project errors")))
     :config
     (setq flymake-no-changes-timeout 0.5)  ; 変更後0.5秒でチェック
     (setq flymake-start-syntax-check-on-newline t)
     (setq flymake-merge-all-diagnostics t)
 
     ;; エラー表示の改善
-    (setq flymake-fringe-indicator-position 'left-fringe))
+    (setq flymake-fringe-indicator-position 'left-fringe)
+
+    ;; エラーチェック関連キーバインド
+    (with-eval-after-load 'general
+      (leader-def
+        "e n" '(flymake-goto-next-error :which-key "next error")
+        "e p" '(flymake-goto-prev-error :which-key "prev error")
+        "e l" '(flymake-show-buffer-diagnostics :which-key "list errors")
+        "e L" '(flymake-show-project-diagnostics :which-key "project errors"))))
 #+end_src
 
 * tools
@@ -95,12 +95,12 @@
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
+    :commands (magit-status magit-blame magit-log)
     :bind (("C-x g" . magit-status))
     :init
     ;; Git関連キーバインド
     (with-eval-after-load 'general
       (leader-def
-        "g" '(:ignore t :which-key "git")
         "g g" '(magit-status :which-key "status")
         "g b" '(magit-blame :which-key "blame")
         "g l" '(magit-log :which-key "log"))))
@@ -110,12 +110,11 @@
 #+begin_src emacs-lisp
   (use-package treemacs
     :ensure t
-    :defer t
+    :commands (treemacs)
     :init
     ;; Treemacs関連キーバインド
     (with-eval-after-load 'general
       (leader-def
-        "o" '(:ignore t :which-key "open")
         "o p" '(treemacs :which-key "project tree")))
     :config
     (treemacs-follow-mode t)

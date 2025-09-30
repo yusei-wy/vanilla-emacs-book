@@ -71,10 +71,18 @@ magit の依存パッケージ。Emacs 組み込みの古い transient を回避
   (use-package diff-hl
     :ensure t
     :demand t
-    :hook (dired-mode . diff-hl-dired-mode)
+    :hook ((dired-mode . diff-hl-dired-mode)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
     :config
     (global-diff-hl-mode)
-    (diff-hl-flydiff-mode))
+    (diff-hl-flydiff-mode)
+
+    ;; 外部git操作後の自動更新（フォーカス時）
+    (add-function :after after-focus-change-function
+                  (lambda ()
+                    (when (and (frame-focus-state)
+                               diff-hl-mode)
+                      (diff-hl-update)))))
 #+end_src
 
 * editor

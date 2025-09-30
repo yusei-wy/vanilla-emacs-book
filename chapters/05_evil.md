@@ -149,22 +149,122 @@
 #+end_src
 
 ** leader key (SPC)
+
+*** :after と :commands の使い分け
+
+**** :after の使い方
+
+*意味*: 指定したパッケージがロードされた後に、このパッケージをロード
+
+*使うべき場合*:
+- パッケージが他のパッケージに機能的に依存している
+- 依存先がロードされないとエラーになる
+- 組み込みパッケージ (~:ensure nil~) で general を使う場合
+
+*例*:
+#+begin_src emacs-lisp :tangle no
+;; evil-collection は evil に機能的に依存
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; 組み込みパッケージで general を使う場合
+(use-package eglot
+  :ensure nil
+  :after general
+  :config
+  (with-eval-after-load 'general
+    (leader-def ...)))
+#+end_src
+
+**** :commands の使い方
+
+*意味*: 指定したコマンドが実行された時に、パッケージを自動ロード
+
+*使うべき場合*:
+- パッケージが独立している
+- キーバインドで使うコマンドが明確
+- 起動時にロードする必要がない（起動時間改善）
+
+*例*:
+#+begin_src emacs-lisp :tangle no
+;; たまにしか使わないパッケージ
+(use-package vundo
+  :ensure t
+  :commands (vundo)
+  :init
+  (with-eval-after-load 'general
+    (leader-def "u" '(vundo :which-key "undo tree"))))
+#+end_src
+
+**** 外部パッケージで general を使う場合
+
+*重要*: ~:after general~ は不要（~with-eval-after-load 'general~ で十分）
+
+*推奨パターン*:
+#+begin_src emacs-lisp :tangle no
+(use-package パッケージ名
+  :ensure t
+  :commands (コマンド1 コマンド2)  ; 自動ロード
+  :init
+  (with-eval-after-load 'general
+    (leader-def "キー" '(コマンド1 :which-key "..."))))
+#+end_src
+
+**** 組み込みパッケージで general を使う場合
+
+*注意*: ~:after general~ が必要、かつ ~:config~ セクションを使う
+
+*理由*: 組み込みパッケージの ~:init~ は general の前に実行される可能性がある
+
+*正しい例*:
+#+begin_src emacs-lisp :tangle no
+(use-package flymake
+  :ensure nil
+  :after general
+  :config  ; :init ではなく :config
+  (with-eval-after-load 'general
+    (leader-def
+      "e n" '(flymake-goto-next-error :which-key "next error")
+      ...)))
+#+end_src
+
+*該当パッケージ*: eglot, flymake
+
+**** キーバインド定義の使い分け
+
+*1. leader-def*: SPC プレフィックス付きコマンド用（VSCode 風）
+- 例: ~(leader-def "/" '(consult-ripgrep :which-key "search"))~
+
+*2. general-def*: 特定モードや状態の直接バインド用
+- Evil state や keymap を明示的に指定する場合
+- 例: ~(general-def :states '(insert) "C-n" #'company-select-next)~
+
+*3. with-eval-after-load*: 遅延読み込みパッケージ対応
+- ~:init~ セクション内で、依存パッケージ読み込み後にキーバインドを定義
+- 例: ~(with-eval-after-load 'general (leader-def ...))~
+
+*推奨パターン*:
+- use-package 内では ~:init~ + ~with-eval-after-load 'general~ を使用
+- SPC コマンドは ~leader-def~ を優先使用
+- モード固有のキーは ~general-def~ を使用
+
 #+begin_src emacs-lisp
   (use-package general
     :ensure t
     :after evil
+    :demand t
     :config
-    ;; SPCキーの既存バインドを解除
     (general-def
       :states '(normal visual motion)
       "SPC" nil)
 
-    ;; リーダーキーの定義
     (general-create-definer leader-def
       :states '(normal visual)
       :prefix "SPC")
 
-    ;; 基本的なキーバインド構造とコア機能
     (leader-def
       ;; グループ定義
       "f" '(:ignore t :which-key "file")

@@ -45,6 +45,7 @@
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
+    :after general
     :init
     ;; SPCキーバインドを事前定義
     (with-eval-after-load 'general
@@ -85,13 +86,13 @@
   ;; consult-projectile: consultとの統合
   (use-package consult-projectile
     :ensure t
-    :after (consult projectile)
+    :commands (consult-projectile
+               consult-projectile-switch-project)
     :init
     ;; SPCキーバインドを事前定義
     (with-eval-after-load 'general
       (leader-def
-        "f p" '(consult-projectile :which-key "quick open")
-        "p f" '(consult-projectile-find-file :which-key "find file")
+        "p f" '(consult-projectile :which-key "quick open")
         "p p" '(consult-projectile-switch-project :which-key "switch project"))))
 #+end_src
 
@@ -100,6 +101,12 @@
   (use-package evil-mc
     :ensure t
     :after evil
+    :commands (evil-mc-make-and-goto-next-match
+               evil-mc-skip-and-goto-next-match
+               evil-mc-make-all-cursors
+               evil-mc-undo-all-cursors
+               evil-mc-make-and-goto-prev-match
+               global-evil-mc-mode)
     :init
     (with-eval-after-load 'general
       (general-define-key
