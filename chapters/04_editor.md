@@ -29,6 +29,15 @@
   (global-hl-line-mode 1)
 #+end_src
 
+** カーソル位置の記憶
+#+begin_src emacs-lisp
+  (use-package saveplace
+    :ensure nil
+    :hook (after-init . save-place-mode)
+    :custom
+    (save-place-file (locate-user-emacs-file "places")))
+#+end_src
+
 ** Editor補助機能
 
 *** 括弧の自動補完
@@ -113,6 +122,7 @@
 
 ### ✨ この章で得られたもの
 - ✅ フォント設定
+- ✅ カーソル位置の自動復元（save-place-mode）
 - ✅ 安全な自動バックアップ機能
 - ✅ ウィンドウ間の高速移動（ace-window）
 - ✅ 詳細なヘルプシステム（helpful）
