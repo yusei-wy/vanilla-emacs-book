@@ -188,6 +188,13 @@ Emacsの基礎設定。OS固有設定、文字コード、バックアップ、�
   (setq read-process-output-max (* 1024 1024))  ; 1MB
 #+end_src
 
+** indent
+#+begin_src emacs-lisp
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default standard-indent 2)
+#+end_src
+
 ** bugfix
 
 *** org-mode のコードブロック内 indent 問題
@@ -202,6 +209,14 @@ Git管理下のファイルへのシンボリックリンクを開くたびに�
 
 #+begin_src emacs-lisp
   (setq vc-follow-symlinks t)
+#+end_src
+
+*** macOS の ls は --dired オプション非対応
+macOSの`ls`コマンドは`--dired`オプションに対応していないため、警告を抑制。
+
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq dired-use-ls-dired nil))
 #+end_src
 ```
 

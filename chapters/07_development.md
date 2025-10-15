@@ -23,18 +23,51 @@
     :ensure nil  ; 組み込みパッケージ
     :after general
     :hook ((go-mode . eglot-ensure)
+           (go-ts-mode . eglot-ensure)
            (typescript-mode . eglot-ensure)
+           (typescript-ts-mode . eglot-ensure)
+           (tsx-ts-mode . eglot-ensure)
            (js-mode . eglot-ensure)
+           (js-ts-mode . eglot-ensure)
            (js2-mode . eglot-ensure)
            (rjsx-mode . eglot-ensure)
            (python-mode . eglot-ensure)
            (haskell-mode . eglot-ensure)
            (web-mode . eglot-ensure)
+           (html-mode . eglot-ensure)
+           (css-mode . eglot-ensure)
            (json-mode . eglot-ensure)
-           (yaml-mode . eglot-ensure))
+           (yaml-mode . eglot-ensure)
+           (conf-toml-mode . eglot-ensure))
     :config
     (setq eglot-autoshutdown t)
     (setq eglot-sync-connect 0)
+
+    ;; gopls (Go)
+    (add-to-list 'eglot-server-programs
+                 '((go-mode go-ts-mode) . ("gopls")))
+
+    ;; Biome LSP (JS, TS, JSON)
+    (add-to-list 'eglot-server-programs
+                 '((js-mode js-ts-mode) . ("biome" "lsp-proxy")))
+    (add-to-list 'eglot-server-programs
+                 '((typescript-mode typescript-ts-mode tsx-ts-mode) . ("biome" "lsp-proxy")))
+    (add-to-list 'eglot-server-programs
+                 '(json-mode . ("biome" "lsp-proxy")))
+
+    ;; vscode-langservers-extracted (HTML, CSS)
+    (add-to-list 'eglot-server-programs
+                 '(html-mode . ("vscode-html-language-server" "--stdio")))
+    (add-to-list 'eglot-server-programs
+                 '(css-mode . ("vscode-css-language-server" "--stdio")))
+
+    ;; YAML Language Server
+    (add-to-list 'eglot-server-programs
+                 '(yaml-mode . ("yaml-language-server" "--stdio")))
+
+    ;; Taplo LSP (TOML)
+    (add-to-list 'eglot-server-programs
+                 '(conf-toml-mode . ("taplo" "lsp" "stdio")))
 
     ;; LSP関連キーバインド
     (with-eval-after-load 'general
@@ -46,6 +79,9 @@
         "r" '(eglot-rename :which-key "rename")
         "f" '(eglot-format :which-key "format")
         "d" '(xref-find-definitions :which-key "find definitions")
+        "i" '(eglot-find-implementation :which-key "find implementation")
+        "D" '(eglot-find-declaration :which-key "find declaration")
+        "t" '(eglot-find-typeDefinition :which-key "find type definition")
         "R" '(xref-find-references :which-key "find references"))))
 
   ;; Format on save
@@ -118,6 +154,7 @@
         "o p" '(treemacs :which-key "project tree")))
     :config
     (treemacs-follow-mode t)
+    (treemacs-project-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-git-mode 'deferred))
 

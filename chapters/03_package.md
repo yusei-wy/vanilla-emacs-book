@@ -77,6 +77,19 @@ config.orgに追加：
     :custom
     (which-key-idle-delay 0.3))
 #+end_src
+
+*** exec-path-from-shell: シェルの環境変数を Emacs に取り込む
+
+*なぜ必要か*:
+- mise でインストールした LSP などを利用できる様に
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
 ```
 
 ### ✨ この章で得られたもの

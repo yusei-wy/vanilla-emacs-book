@@ -77,7 +77,11 @@
     (setq evil-want-C-i-jump nil)  ; TABキーの競合回避
     (setq evil-want-C-u-scroll t)  ; C-uでスクロールアップを有効化
     :config
-    (evil-mode 1))
+    (evil-mode 1)
+    ;; Eglot連携: g i で実装へジャンプ
+    (with-eval-after-load 'eglot
+      (evil-define-key 'normal 'global
+        (kbd "g i") 'eglot-find-implementation)))
 #+end_src
 
 *** IME の自動制御
@@ -95,7 +99,10 @@
     :after evil
     :ensure t
     :config
-    (evil-collection-init))
+    (evil-collection-init)
+    :custom
+    ;; Dired でも SPC を leader key としてコマンドを呼び出せる様に
+    (evil-collection-key-blacklist '("SPC")))
 
   ;; evil-surround: 囲み文字の操作（cs"' ds" ysiw"）
   (use-package evil-surround
@@ -269,6 +276,7 @@
       ;; グループ定義
       "f" '(:ignore t :which-key "file")
       "b" '(:ignore t :which-key "buffer")
+      "w" '(:ignore t :which-key "window")
       "p" '(:ignore t :which-key "project")
       "g" '(:ignore t :which-key "git")
       "l" '(:ignore t :which-key "lsp")
@@ -279,6 +287,7 @@
       "o" '(:ignore t :which-key "open")
       "h" '(:ignore t :which-key "help/benchmark")
       "d" '(:ignore t :which-key "debug")
+      "t" '(:ignore t :which-key "test")
       ;; コア機能（常に必要）
       "SPC" '(execute-extended-command :which-key "M-x")
       ":" '(eval-expression :which-key "eval")
@@ -287,7 +296,13 @@
       "f s" '(save-buffer :which-key "save file")
       ;; 基本バッファ操作
       "b b" '(switch-to-buffer :which-key "switch buffer")
-      "b k" '(kill-this-buffer :which-key "kill buffer")))
+      "b k" '(kill-this-buffer :which-key "kill buffer")
+      ;; Window 操作
+      "w d" '(delete-window :which-key "delete window")
+      "w o" '(delete-other-windows :which-key "delete other windows")
+      "w v" '(split-window-right :which-key "split right")
+      "w s" '(split-window-below :which-key "split below")
+      "w w" '(other-window :which-key "other window")))
 #+end_src
 
 ** undo

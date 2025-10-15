@@ -27,90 +27,75 @@
     (vterm-kill-buffer-on-exit t)      ; シェル終了時にバッファを閉じる
     (vterm-copy-exclude-prompt t)      ; コピー時にプロンプトを除外
     :config
-    ;; Vterm内でEvilモードの切り替え
-    (evil-set-initial-state 'vterm-mode 'emacs))
+    ;; 全てのキーをカスタマイズ可能に
+    (setq vterm-keymap-exceptions nil)
+
+    ;; Return キーを通常通りターミナルに送る
+    (define-key vterm-mode-map [return] #'vterm-send-return)
+
+    ;; Evil連携: 起動時に Insert mode + カーソルを box に
+    (add-hook 'vterm-mode-hook
+      (lambda ()
+        (setq-local evil-insert-state-cursor 'box)
+        (evil-insert-state)))
+
+    ;; Normal mode: Insert mode に戻るキーバインド
+    (evil-define-key 'normal vterm-mode-map
+      (kbd "i") #'evil-insert-state
+      (kbd "a") #'evil-append
+      (kbd "p") #'vterm-yank
+      (kbd "u") #'vterm-undo)
+
+    ;; Insert mode: シェルの標準操作をターミナルに送る
+    (evil-define-key 'insert vterm-mode-map
+      (kbd "C-a") #'vterm--self-insert
+      (kbd "C-e") #'vterm--self-insert
+      (kbd "C-f") #'vterm--self-insert
+      (kbd "C-b") #'vterm--self-insert
+      (kbd "C-d") #'vterm--self-insert
+      (kbd "C-k") #'vterm--self-insert
+      (kbd "C-u") #'vterm--self-insert
+      (kbd "C-r") #'vterm--self-insert
+      (kbd "C-c") #'vterm--self-insert
+      (kbd "C-g") #'vterm--self-insert))
 
   ;; multi-vterm：複数ターミナル管理
   (use-package multi-vterm
     :ensure t
     :defer t
+    :init
+    ;; カスタム関数: 現在のディレクトリでvtermを開く
+    (defun my/vterm-here ()
+      "Open vterm in current directory."
+      (interactive)
+      (let ((default-directory (if (buffer-file-name)
+                                   (file-name-directory (buffer-file-name))
+                                 default-directory)))
+        (vterm)))
+
+    ;; キーバインド
+    (with-eval-after-load 'general
+      (leader-def
+        "o t" '(multi-vterm :which-key "terminal")
+        "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
+        "o ]" '(multi-vterm-next :which-key "next terminal")
+        "o [" '(multi-vterm-prev :which-key "prev terminal")
+        "o h" '(my/vterm-here :which-key "terminal here")))
     :config
     (setq multi-vterm-dedicated-window-height 30))
-
-  ;; ターミナル関連キーバインド
-  (with-eval-after-load 'general
-    (leader-def
-      "o t" '(multi-vterm :which-key "terminal")
-      "o T" '(multi-vterm-dedicated-toggle :which-key "dedicated terminal")
-      "o n" '(multi-vterm-next :which-key "next terminal")
-      "o p" '(multi-vterm-prev :which-key "prev terminal")))
-#+end_src
-
-** ターミナルとの連携強化
-#+begin_src emacs-lisp
-  ;; vterm-toggle: 簡単なターミナル切り替え
-  (use-package vterm-toggle
-    :ensure t
-    :defer t
-    :custom
-    (vterm-toggle-fullscreen-p nil)     ; フルスクリーンで開かない
-    (vterm-toggle-scope 'project)       ; プロジェクトごとにターミナル
-    :bind ("C-`" . vterm-toggle)        ; C-`でトグル
-    :config
-    ;; ポップアップウィンドウの設定
-    (setq vterm-toggle-hide-method 'reset-window-configration))
-
-  ;; コマンドをVtermで実行
-  (defun my/run-in-vterm (command)
-    "Run COMMAND in vterm."
-    (interactive "sCommand: ")
-    (let ((vterm-shell command))
-      (vterm)))
-
-  ;; ファイルパスをVtermに送る
-  (defun my/send-to-vterm (text)
-    "Send TEXT to vterm."
-    (interactive "sText: ")
-    (vterm-send-string text))
-#+end_src
-
-** ターミナル便利機能
-#+begin_src emacs-lisp
-  ;; 現在のディレクトリでVtermを開く
-  (defun my/vterm-here ()
-    "Open vterm in current directory."
-    (interactive)
-    (let ((default-directory (if (buffer-file-name)
-                                 (file-name-directory (buffer-file-name))
-                               default-directory)))
-      (vterm)))
-
-  ;; Vterm内でのコピー/ペースト改善
-  (defun my/vterm-yank ()
-    "Yank in vterm mode."
-    (interactive)
-    (if (evil-normal-state-p)
-        (vterm-yank)
-      (vterm-send-C-y)))
-
-  (with-eval-after-load 'vterm
-    (define-key vterm-mode-map (kbd "C-y") 'my/vterm-yank))
-
-  ;; ターミナル便利機能のキーバインド
-  (with-eval-after-load 'general
-    (leader-def
-      "o h" '(my/vterm-here :which-key "terminal here")
-      "o r" '(my/run-in-vterm :which-key "run command")))
 #+end_src
 ```
 
 ### 💡 使い方のヒント
 
-- **C-`**: ターミナルのトグル（表示/非表示）
 - **SPC o t**: 新しいターミナルを開く
-- **SPC o T**: 専用ターミナルのトグル
+- **SPC o T**: 専用ターミナルのトグル（画面下部に固定表示）
 - **SPC o h**: 現在のディレクトリでターミナルを開く
-- **Vterm内でC-c C-t**: Evilモードへ切り替え（テキスト選択用）
+- **SPC o ]** / **SPC o [**: 次/前のターミナルに切り替え
+- **Vterm内でESC**: Normal modeへ（テキスト選択用）
+- **Normal modeでi**: Insert modeに戻る（ターミナル操作再開）
+- **Normal modeでp**: ヤンクしたテキストを貼り付け
+- **Normal modeでu**: アンドゥ
 
 ### ✨ この章で得られたもの
 - ✅ 完全なターミナルエミュレーション
