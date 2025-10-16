@@ -90,12 +90,53 @@ config.orgに追加：
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+end_src
+
+*** performance optimization
+
+**** gcmh: スマートGC管理
+アイドル時に自動的にGCを実行し、作業中のパフォーマンスを維持。
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :ensure t
+    :diminish
+    :init
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024)  ; 16MB
+          gcmh-verbose nil)
+    :config
+    (gcmh-mode 1))
+#+end_src
+
+**** benchmark-init: 起動時間の詳細分析
+各パッケージの読み込み時間を可視化。
+
+#+begin_src emacs-lisp
+  (use-package benchmark-init
+    :ensure t
+    :config
+    (add-hook 'after-init-hook 'benchmark-init/deactivate))
+#+end_src
+
+**** esup: 詳細プロファイラー
+M-x esup で起動プロセスの詳細分析。
+
+#+begin_src emacs-lisp
+  (use-package esup
+    :ensure t
+    :defer t
+    :commands esup)
+#+end_src
 ```
 
 ### ✨ この章で得られたもの
 - ✅ パッケージを自由にインストールできる環境
 - ✅ キーバインドのヘルプ表示（which-key）
 - ✅ 非同期処理による高速なパッケージ管理
+- ✅ シェル環境変数の自動取り込み（exec-path-from-shell）
+- ✅ スマートGC管理（gcmh）
+- ✅ 起動時間の詳細分析（benchmark-init）
+- ✅ 詳細プロファイラー（esup）
 
 ---
 

@@ -186,6 +186,10 @@ Emacsの基礎設定。OS固有設定、文字コード、バックアップ、�
   (setq large-file-warning-threshold (* 100 1024 1024))  ; 100MB
   ;; 読み込みプロセスの最適化
   (setq read-process-output-max (* 1024 1024))  ; 1MB
+  ;; 長い行を含むファイルのパフォーマンス最適化
+  (global-so-long-mode 1)
+  ;; use-package統計を有効化（M-x use-package-reportで確認可能）
+  (setq use-package-compute-statistics t)
 #+end_src
 
 ** indent

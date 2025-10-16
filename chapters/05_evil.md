@@ -341,6 +341,36 @@
     ;; Gitコミットメッセージなどは永続化しない
     (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))
 #+end_src
+
+** performance measurement
+
+パフォーマンス測定用のヘルパー関数とキーバインド。
+
+*なぜ elpaca-after-init-hook を使うのか*:
+- 通常の ~after-init-hook~ はElpacaパッケージのロード完了前に実行される
+- ~elpaca-after-init-hook~ を使うことで、全パッケージロード後にキーバインドを安全に登録できる
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :commands (my/show-startup-time)
+    :init
+    (defun my/show-startup-time ()
+      "Show Emacs startup time."
+      (interactive)
+      (message "Emacs loaded in %.2f seconds with %d garbage collections"
+               (float-time (time-subtract after-init-time before-init-time))
+               gcs-done))
+
+    (add-hook 'elpaca-after-init-hook
+      (lambda ()
+        (when (fboundp 'leader-def)
+          (leader-def
+            "h b" '(my/show-startup-time :which-key "show startup time")
+            "h B" '(benchmark-init/show-durations-tree :which-key "benchmark details")
+            "h E" '(esup :which-key "profile startup")
+            "h p" '(use-package-report :which-key "package stats"))))))
+#+end_src
 ```
 
 ### ✨ この章で得られたもの
